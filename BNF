@@ -1,0 +1,24 @@
+BNF: 
+    Program ::= Program’ Program 
+    Program' ::= Const Type
+                | ε
+    Const ::= const 
+            | ε
+    Type ::= String
+            | Coord
+            | Number
+            | City 
+            | ε
+    String ::= string variable = "variable"
+    Coord ::= coord variable = (Primary, Primary) 
+            | coord variable = (variable, real) 
+            | coord variable = (real, variable) 
+            | coord variable = (variable, variable) 
+    Primary ::= real
+              | variable
+              | ( Aditive )
+    Aditive
+    Number ::= num variable = real
+    City ::= city variable {
+
+    }
