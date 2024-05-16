@@ -1,9 +1,11 @@
-const num spremenljivka = 14
-const num spremenljivka = 14.421
-string spremenljivka2 = "restavracija"
-coord coordinate = (46.245267, 15.234526) //(num, num)
+
 
 city ime {
+    const num spremenljivka = 14
+    const num spremenljivka = 14.421
+    string spremenljivka2 = "restavracija"
+    coord coordinate = (46.245267, 15.234526) //(num, num)  
+    
     restaurant r1 {
         name: "name"
         shape: { //preverja se, da je oblika smiselna (da se ne križa...)
@@ -34,7 +36,7 @@ city ime {
             line[(2, 0), (2, 4)]
             line[(2, 4), (0, 0)]
         }
-        marker nameSpremenjivke
+        marker: nameSpremenjivke
     } 
 
     number p1 = 46.002300
@@ -48,7 +50,7 @@ city ime {
             line[(2, 0), (2 , 4)]
             line[(2, 4), (0 , 0)]
         }
-        marker[(x, y)] //središče restavracije (če ni podano se izračuna sredina)
+        marker: point[(x, y)] //središče restavracije (če ni podano se izračuna sredina)
     } 
 
     road name {
