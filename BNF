@@ -4,21 +4,56 @@ BNF:
                 | ε
     Const ::= const 
             | ε
+    _____________________________
+    
+
+    Program = City Program
+    City ::= city variable { InnerType }
+           | ε
+    InnerType ::= InnerType' InnerType
+    InerType' ::= Type
+                | Object
+                | ForLoop
     Type ::= String
             | Coord
             | Number
-            | City 
             | ε
-    String ::= string variable = "variable"
-    Coord ::= coord variable = (Primary, Primary) 
-            | coord variable = (variable, real) 
-            | coord variable = (real, variable) 
-            | coord variable = (variable, variable) 
+    String ::= string variable = " variable "
+    Coord ::= coord variable = Dots
+    Dots ::= ( Primary , Primary ) 
+    Number ::= num variable = real
+    Aditive ::= skopiraj________________________________________!!!!
+    List ::= list < TypeName > = [ Primary Primary' ]
     Primary ::= real
               | variable
               | ( Aditive )
-    Aditive
-    Number ::= num variable = real
-    City ::= city variable {
-
-    }
+    Primary' ::= Primary
+                | ε
+    TypeName ::= string
+              | coord
+              | number
+              | list
+              | restaurant
+    Object ::= Road
+             | Restaurant
+             | Radius
+             | Marker
+             | Line
+             | ε
+    Road ::= road variable { path ( Line, Primary ) Paths }
+    Paths ::= path ( Line, Primary ) 
+            | ε
+    Line ::= line [ Dots, Dots ]
+    Restaurant ::= restaurant variable { Name Shape Marker }
+    Name ::= name : String'
+    String' ::= " #string " 
+              | variable
+    Shape ::= { Line Line Line Line' }
+    Line' ::= Line Line'
+            | ε
+    Marker ::= marker : Point
+    Point ::= point [ Dots ]
+    Radius ::= radius variable = ( Dots , Primary )
+    Marker ::= marker variable = Dots
+    ForLoop ::= foreach variable in variable { highlight ( variable ) }
+              | ε

@@ -34,7 +34,7 @@ city ime {
             line[(2, 0), (2, 4)]
             line[(2, 4), (0, 0)]
         }
-        marker: point[(3, 5)]
+        marker nameSpremenjivke
     } 
 
     number p1 = 46.002300
@@ -75,10 +75,10 @@ city ime {
         print(route.name)
     }
 
-    radius((1, 4), 4) //radius(coord, distance)
+    radius name = ((1, 4), 4) //radius(coord, distance)
     foreach x in radius {
         highlight(x)
     }
 
-    marker name (8, 3)
+    marker name = (8, 3)
 }
