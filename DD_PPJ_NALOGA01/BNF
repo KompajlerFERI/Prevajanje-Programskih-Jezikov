@@ -22,7 +22,21 @@ BNF:
     Coord ::= coord variable = Dots
     Dots ::= ( Primary , Primary ) 
     Number ::= num variable = real
-    Aditive ::= skopiraj________________________________________!!!!
+    Aditive ::= Multiplicative Additive'
+    Aditive' ::= plus Multiplicative Additive'
+              | minus Multiplicative Additive'
+              | ε
+    Multiplicative ::= Exponential Multiplicative'
+    Multiplicative' ::= times Exponential Multiplicative'
+                      | divide Exponential Multiplicative'
+                      | intiger-divide Exponential Multiplicative'
+                      | ε
+    Exponential ::= Unary Exponential'
+    Exponential' ::= pow Unary Exponential'
+                   | ε
+    Unary ::= plus Primary 
+            | minus Primary 
+            | Primary
     List ::= list < TypeName > = [ Primary Primary' ]
     Primary ::= real
               | variable
@@ -52,6 +66,7 @@ BNF:
     Line' ::= Line Line'
             | ε
     Marker ::= marker : Point
+             | ε
     Point ::= point [ Dots ]
     Radius ::= radius variable = ( Dots , Primary )
     Marker ::= marker variable = Dots
