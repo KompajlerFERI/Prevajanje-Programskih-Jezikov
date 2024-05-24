@@ -2,190 +2,305 @@ FIRST AND FOLLOW za LL(1)
 
 
 
+Main_Program ::= Main_Program’’ Main_Program’
 FIRST(Main_Program) = FIRST(Main_Program’’) ∪ FIRST(Main_Program’)
                     = {const, type_number, type_string, type_coordinate, type_list, variable, city}
 
+Main_Program’ ::= Main_Program Main_Program’ | ε
 FIRST(Main_Program’) = FIRST(FIRST(Main_Program) ° FIRST(Main_Program’)) ∪ FIRST(ε)
                      = {const, type_number, type_string, type_coordinate, type_list, variable, city} ∪ {ε}
 
+Main_Program’’ ::= Declaration | Assignment | City | For
 FIRST(Main_Program’’) = FIRST(Declaration) ∪ FIRST(Assignment) ∪ FIRST(City)
                       = {const, type_number, type_string, type_coordinate, type_list} ∪ {variable} ∪ {city}
 
+Declaration ::= const Declaration’ | Declaration’
 FIRST(Declaration) = FIRST(const Declaration’) ∪ FIRST(Declaration’)
-                   = {const} ∪ {type_number, type_string, type_coordinate, type_list}
+                   = {const} ∪ {type_number, type_string, type_coordinate, type_list} ✅
 
+Declaration’ ::= Type variable equals Expression
 FIRST(Declaration’) = FIRST(FIRST(Type) ° FIRST(variable) ° FIRST(equals) ° FIRST(Expression)) 
-                    = {type_number} ∪ {type_string} ∪ {type_coordinate} ∪ {type_list}
+                    = {type_number, type_string, type_coordinate, type_list} ✅
 
+Assignment ::= variable equals Expression
 FIRST(Assignment) = FIRST(FIRST(variable) ° FIRST(equals) ° FIRST(Expression)) 
-                  = {variable}
+                  = {variable} ✅
 
+Type ::= type_number | type_string | type_coordinate | type_list lthen Type mthen
 FIRST(Type) = FIRST(type_number) ∪ FIRST(type_string) ∪ FIRST(type_coordinate) ∪ FIRST(type_list lthen Type mthen)
-            = {type_number} ∪ {type_string} ∪ {type_coordinate} ∪ {type_list}
+            = {type_number} ∪ {type_string} ∪ {type_coordinate} ∪ {type_list} ✅
 
+Expression ::= Additive
 FIRST(Expression) = FIRST(Additive)
                   = {plus, minus, real, variable, lbracket, lsq_bracket}
 
+Additive ::= Multiplicative Additive’
 FIRST(Additive) = FIRST(FIRST(Multiplicative) ° FIRST(Additive’))
                 = {plus, minus, real, variable, lbracket, lsq_bracket}
 
+Additive’ ::= plus Multiplicative Additive’ | minus Multiplicative Additive’ | ε
 FIRST(Additive’) = FIRST(plus Multiplicative Additive’) ∪ FIRST(minus Multiplicative Additive’) ∪ FIRST(ε)
                  = {plus} ∪ {minus} ∪ {ε}
 
+Multiplicative ::= Exponential Multiplicative’
 FIRST(Multiplicative) = FIRST(FIRST(Exponential) ° FIRST(Multiplicative’))
                       = {plus, minus, real, variable, lbracket, lsq_bracket}
 
+Multiplicative’ ::= times Exponential Multiplicative’ | divide Exponential Multiplicative’ | integer-divide Exponential Multiplicative’ | ε
 FIRST(Multiplicative’) = FIRST(times Exponential Multiplicative’) ∪ FIRST(divide Exponential Multiplicative’) ∪ FIRST(integer-divide Exponential Multiplicative’) ∪ FIRST(ε)
                        = {times} ∪ {divide} ∪ {integer-divide} ∪ {ε}
 
+Exponential ::= Unary Exponential’
 FIRST(Exponential) = FIRST(FIRST(Unary) ° FIRST(Exponential’))
                    = {plus, minus, real, variable, lbracket, lsq_bracket}
 
+Exponential’ ::= pow Unary Exponential’ | ε
 FIRST(Exponential’) = FIRST(pow Unary Exponential’) ∪ FIRST(ε)
                     = {pow} ∪ {ε}
 
+Exponential’ ::= pow Unary Exponential’ | ε
 FIRST(Unary) = FIRST(plus Primary) ∪ FIRST(minus Primary) ∪ FIRST(Primary)
              = {plus} ∪ {minus} ∪ {real, variable, lbracket, lsq_bracket}
 
+Primary ::= real | variable | lbracket Additive rbracket | lsq_bracket Inner_List rsq_bracket
 FIRST(Primary) = FIRST(real) ∪ FIRST(variable) ∪ FIRST(lbracket Additive rbracket) ∪ FIRST(lsq_bracket Inner_List rsq_bracket)
                = {real} ∪ {variable} ∪ {lbracket} ∪ {lsq_bracket}
 
+Inner_List ::= Inner_List’’ Inner_List’
 FIRST(Inner_List) = FIRST(FIRST(Inner_List’’) ° FIRST(Inner_List’’))
                   = {plus, minus, real, variable, lbracket, lsq_bracket}
 
+Inner_List’ ::= comma Inner_List’’ Inner_List | ε
 FIRST(Inner_List’) = FIRST(comma Inner_List’’ Inner_List) ∪ FIRST(ε)
                    = {comma} ∪ {ε}
 
+Inner_List’’ ::= Expression
 FIRST(Inner_List’’) = FIRST(Expression)
                     = {plus, minus, real, variable, lbracket, lsq_bracket}
 
+City ::= city variable block_start City’ block_end
 FIRST(City) = FIRST(city variable block_start City’ block_end)
             = {city}
 
+City’ ::= City’’’ City’’
 FIRST(City’) = FIRST(FIRST(City’’’) ° FIRST(City’’))
              = {name, road, const, type_number, type_string, type_coordinate, type_list, variable, print}
 
+City’’ ::= City’ City’’ | ε
 FIRST(City’’) = FIRST(FIRST(City’) ° FIRST(City’’)) ∪ FIRST(ε)
               = {name, road, const, type_number, type_string, type_coordinate, type_list, variable, print} ∪ ε
 
+City’’’ ::= City_Constructs | Declaration | Assignment | Print
 FIRST(City’’’) = FIRST(City_Constructs) ∪ FIRST(Declaration) ∪ FIRST(Assignment) ∪ FIRST(Print)
                = {name, road} ∪ {const, type_number, type_string, type_coordinate, type_list} ∪ {variable} ∪ {print}
 
+Print ::= print lbracket Expression rbracket
 FIRST(Print) = FIRST(FIRST(print) ° FIRST(lbracket) ° FIRST(Expression) ° FIRST(rbracket))
-             = {print}
+             = {print} ✅
 
+City_Constructs ::= Restaurant | Road
 FIRST(City_Constructs) = FIRST(Restaurant) ∪ FIRST(Road)
                        = {name} ∪ {road}
 
+Restaurant ::= Name Shape Marker Routes
 FIRST(Restaurant) = FIRST(FIRST(Name) ° FIRST(Shape) ° FIRST(Marker) ° FIRST(Routes))
                   = {name}
 
+Name ::= name colon String
 FIRST(Name) = FIRST(name colon String)
             = {name}
 
+String ::= variable | string
 FIRST(String) = FIRST(variable) ∪ FIRST(string)
               = {variable} ∪ {string}
 
+Shape ::= shape colon block_start Lines block_end
 FIRST(Shape) = FIRST(shape colon block_start Lines block_end)
              = {shape}
 
+Lines ::= Line Line Line Line’
 FIRST(Lines) = FIRST(FIRST(Line) ° FIRST(Line) ° FIRST(Line) ° FIRST(Line’))
              = {line}
 
+Line’ ::= Line Line’ | ε 
 FIRST(Line’) = FIRST(FIRST(Line) ° FIRST(Line’)) ∪ FIRST(ε)
              = {line} ∪ ε
 
+Line ::= line lsq_bracket Coord comma Coord rsq_bracket
 FIRST(Line) = FIRST(line lsq_bracket Coord comma Coord rsq_bracket)
             = {line}
 
+Coord ::= variable | lbracket Expression comma Expression rbracket
 FIRST(Coord) = FIRST(variable) ∪ FIRST(lbracket Expression comma Expression rbracket)
              = {variable} ∪ {lbracket}
 
+Marker ::= Marker’ | ε
 FIRST(Marker) = FIRST(Marker’) ∪ FIRST(ε)
               = {marker} ∪ ε
 
+Marker’ ::= marker colon Point
 FIRST(Marker’) = FIRST(marker colon Point)
                = {marker}
 
+Point ::= point lsq_bracket Coord rsq_bracket
 FIRST(Point) = point lsq_bracket Coord rsq_bracket
 
+Routes ::= Routes’ | ε
 FIRST(Routes) = FIRST(Routes’) ∪ FIRST(ε)
               = {routes} ∪ ε
 
+Routes’ ::= routes colon lsq_bracket Roads rsq_bracket
 FIRST(Routes’) = FIRST(routes colon lsq_bracket Roads rsq_bracket)
                = {routes}
 
 /////////////////////////////////////Za to nisn ziher/////////////////////////////////////
+Roads ::= Road Road’
 FIRST(Roads) = FIRST(FIRST(Road) ° FIRST(Road’))
              = {road}
 
+Road ::= road variable block_start Name Road_Shapes block_end
 FIRST(Road’) = FIRST(comma Road Roads’) ∪ FIRST(ε)
              = {comma} ∪ ε
 
+Road ::= road variable block_start Name Road_Shapes block_end
 FIRST(Road) = FIRST(road variable block_start Name Road_Shapes block_end)
             = {road}
 
+Road_Shapes ::= shape colon block_start  Road_Shapes’ Road_Shapes block_end
 FIRST(Road_Shapes) = FIRST(shape colon block_start Road_Shapes’ Road_Shapes block_end)
                    = {shape}
 FOLLOW(Road_Shapes) = FIRST(block_end . FOLLOW(Road_Shapes))
                     = {block_end}
 
+Road_Shapes’ ::= Road_Shape Road_Shapes’ | ε 
 FIRST(Road_Shapes’) = FIRST(FIRST(Road_Shape) ° FIRST(Road_Shapes’)) ∪ FIRST(ε)
                     = {shape} | {ε}
 FOLLOW(Road_Shapes’) = FIRST(Road_Shapes ° FOLLOW(Road_Shapes))
-                     = FIRST
+                     = FIRST(Road_Shapes)
+                     = {shape}
 
+Road_Shape ::= Line | Bend
 FIRST(Road_Shape) = FIRST(Line) ∪ FIRST(Bend)
                   = {line} ∪ {bend}
 FOLLOW(Road_Shape) = {ε}
 
+Bend ::= bend lsq_bracket Coord comma Coord comma Expression rsq_bracket
 FIRST(Bend) = FIRST(bend lsq_bracket Coord comma Coord comma Expression rsq_bracket)
             = {bend}
 FOLLOW(Bend) = FIRST(ε ° FOLLOW(Road_Shape))
              = FOLLOW(Road_Shape)
              = {ε}
 
+For ::= foreach variable in Variable block_start Program block_end
 FIRST(For) = FIRST(foreach variable in Variable block_start Program block_end)
-           = {foreach}
-FOLLOW(For) = {ε}
+           = {foreach} ✅
+FOLLOW(For) = FIRST(ε . FOLLOW(Main_Program’’))
 
-FIRST(Variable) = FIRST(variable) ∪ FIRST(Radius)
-                = {variable} ∪ {lsq_bracket}
-FOLLOW(Variable) = FIRST(block_start ° FOLLOW(For))
-                 = FOLLOW(For)
-                 = {ε}
+Variable ::= variable | Radius 
+FIRST(Variable) = FIRST(variable) ∪ FIRST(Radius) ✅
+                = {variable} ∪ {lsq_bracket} ✅
+FOLLOW(Variable) = FIRST(block_start ° FOLLOW(For)) ✅
+                 = {block_start} ✅
 
-FIRST(Radius) = FIRST(lsq_bracket Coord comma Expression rsq_bracket)
-              = {lsq_bracket}
-FOLLOW(Radius) = FIRST(ε ° FOLLOW(Variable))
-               = FOLLOW(Variable)
-               = {ε}
+Radius ::= lsq_bracket Coord comma Expression rsq_bracket
+FIRST(Radius) = FIRST(lsq_bracket Coord comma Expression rsq_bracket) ✅
+              = {lsq_bracket} ✅
+FOLLOW(Radius) = FIRST(ε ° FOLLOW(Variable)) = FOLLOW(Variable) ✅
+               = {ε} ✅
 
-FIRST(Program) = FIRST(FIRST(Program’’) ° FIRST(Program’))
-               = {type_number, type_string, type_coordinate, type_list, variable, print, highlight}
+Program ::= Program’’ semicol Program’ 
+FIRST(Program) = FIRST(FIRST(Program’’) ° FIRST(Program’)) ✅
+               = {const, type_number, type_string, type_coordinate, type_list, variable, print, highlight} ✅
+FOLLOW(Program) = FIRST(block_end ° FOLLOW(For)) ✅
+                = {block_end} ✅
+
+Program’ ::= Program Program’ | ε 
+FIRST(Program’) = FIRST(FIRST(Program) ° FIRST(Program’)) ∪ FIRST(ε) ✅
+                = {const, type_number, type_string, type_coordinate, type_list, variable, print, highlight} ∪ {ε} ✅
+FOLLOW(Program’) = FIRST(ε ° FOLLOW(Program’)) ∪ FIRST(ε ° FOLLOW(Program)) ✅
+                 = {ε} ∪ {block_end} ✅
+
+Program’’ ::= Declaration | Assignment | Print | Highlight 
+FIRST(Program’’) = FIRST(Declaration) ∪ FIRST(Assignment) ∪ FIRST(Print) ∪ FIRST(Highlight) ✅
+                 = {const, type_number, type_string, type_coordinate, type_list} ∪ {variable} ∪ {print} ∪ {highlight} ✅
+FOLLOW(Program’’) = FIRST(semicol ° FOLLOW(Program)) ✅
+                  = {semicol} ✅
+
+Highlight ::= highlight lbracket variable rbracket 
+FIRST(Highlight) = FIRST(FIRST(highlight) ° FIRST(lbracket) ° FIRST(variable) ° FIRST(rbracket)) ✅
+                 = {highlight} ✅
+FOLLOW(Highlight) = FIRST(ε ° FOLLOW(Program’’)) ✅
+                  = {semicol} ✅
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Program ::= Program’’ semicol Program’ 
+FIRST(Program) = FIRST(FIRST(Program’’) ° FIRST(semicol) ° FIRST(Program’)) ✅
+               = {const, type_number, type_string, type_coordinate, type_list, variable, print, highlight} ✅
 FOLLOW(Program) = FIRST(block_end ° FOLLOW(For))
                 = {block_end}
 
-FIRST(Program’) = FIRST(FIRST(Program) ° FIRST(Program‘)) ∪ FIRST(ε)
-                = {type_number, type_string, type_coordinate, type_list, variable, print, highlight} ∪ {ε}
-FOLLOW(Program’) = FIRST(ε ° FOLLOW(PROGRAM))
-                 = {block_end}
+Program’ ::= Program Program’ | ε 
+FIRST(Program’) = FIRST(FIRST(Program) ° FIRST(Program’)) ∪ FIRST(ε)
+                = {const, type_number, type_string, type_coordinate, type_list, variable, print, highlight} ∪ {ε} ✅
+FOLLOW(Program’) = FIRST(ε ° FOLLOW(Program’)) ∪ FIRST(ε ° FOLLOW(Program))
+                 = {ε} ∪ {block_end}
 
-FIRST(Program’’) = FIRST(Declaration) ∪ FIRST(Assignment) ∪ FIRST(Print) ∪ FIRST(Highlight)
-                 = {type_number, type_string, type_coordinate, type_list} ∪ {variable} ∪ {print} ∪ {highlight}
-FOLLOW(Program’’) = FIRST(Program’’ ° FOLLOW(PROGRAM'))
-                  = {type_number, type_string, type_coordinate, type_list, variable, print, highlight}
+Program’’ ::= Declaration | Assignment | Print | Highlight 
+FIRST(Program’’) = FIRST(Declaration) ∪ FIRST(Assignment) ∪ FIRST(Print) ∪ FIRST(Highlight) ✅
+                 = {const, type_number, type_string, type_coordinate, type_list} ∪ {variable} ∪ {print} ∪ {highlight} ✅
+FOLLOW(Program’’) = FIRST(Program’ ° FOLLOW(Program))
+                  = {const, type_number, type_string, type_coordinate, type_list, variable, print, highlight}
 
+Highlight ::= highlight lbracket variable rbracket 
+FIRST(Highlight) = FIRST(FIRST(highlight) ° FIRST(lbracket) ° FIRST(variable) ° FIRST(rbracket)) ✅
+                 = {highlight} ✅
+FOLLOW(Highlight) = FIRST(ε ° FOLLOW(Program’’)) ✅
+                  = 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Program ‘’::= Declaration | Assignment | Print | Highlight 
+FIRST(Program’’) = FIRST(Declaration) ∪ FIRST(Assignment) ∪ FIRST(Print) ∪ FIRST(hash Highlight)
+                 = {const, type_number, type_string, type_coordinate, type_list} ∪ {variable} ∪ {print} ∪ {hash}
+FOLLOW(Program’’) = FIRST(Program’ ° FOLLOW(Program))
+                  = {type_number, type_string, type_coordinate, type_list, variable, print, hash} ∪ {ε}
+
+Highlight ::= highlight lbracket variable rbracket 
 FIRST(Highlight) = FIRST(FIRST(highlight) ° FIRST(lbracket) ° FIRST(variable) ° FIRST(rbracket))
-                 = {highlight}
-FOLLOW(Highlight) = FIRST(ε ° FOLLOW(Program’’))
-                  = FOLLOW(Program’’)
-                  = {type_number, type_string, type_coordinate, type_list, variable, print, highlight}
+                 = {highlight} 
+FOLLOW(Highlight) = FIRST(hash ° FOLLOW(Program’’))
+                  = {hash} 
 
-
-
-
- 
 
 
 
@@ -219,4 +334,5 @@ road-> road
 bend-> bend
 foreach-> foreach
 highlight -> highlight
+semicol -> ;
 
