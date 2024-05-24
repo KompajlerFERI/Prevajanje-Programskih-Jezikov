@@ -4,166 +4,242 @@ FIRST AND FOLLOW za LL(1)
 
 Main_Program ::= Main_Program’’ semicol Main_Program’
 FIRST(Main_Program) = FIRST(FIRST(Main_Program’’) ° FIRST(semicol) ° FIRST(Main_Program’)) ✅
-                    = {const, type_number, type_string, type_coordinate, type_list, variable, city, foreach} ✅
+                    = {const, type_number, type_string, type_coordinate, type_list, hash, city, foreach} ✅
 FOLLOW(Main_Program) = Ø ✅
 
 Main_Program’ ::= Main_Program Main_Program’ | ε
 FIRST(Main_Program’) = FIRST(FIRST(Main_Program) ° FIRST(Main_Program’)) ∪ FIRST(ε) ✅
-                     = {const, type_number, type_string, type_coordinate, type_list, variable, city, foreach} ∪ {ε} ✅
+                     = {const, type_number, type_string, type_coordinate, type_list, hash, city, foreach} ∪ {ε} ✅
+FOLLOW(Main_Program’) = 
+                      = 
 
 Main_Program’’ ::= Declaration | Assignment | City | For
 FIRST(Main_Program’’) = FIRST(Declaration) ∪ FIRST(Assignment) ∪ FIRST(City) ∪ FIRST(For) ✅
-                      = {const, type_number, type_string, type_coordinate, type_list} ∪ {variable} ∪ {city} ∪ {foreach} ✅
+                      = {const, type_number, type_string, type_coordinate, type_list} ∪ {hash} ∪ {city} ∪ {foreach} ✅
 FOLLOW(Main_Program’’) = FIRST(semicol ° FOLLOW(Main_Program)) ✅
                        = {semicol} ✅
 
 Declaration ::= const Declaration’ | Declaration’
 FIRST(Declaration) = FIRST(const Declaration’) ∪ FIRST(Declaration’) ✅
                    = {const} ∪ {type_number, type_string, type_coordinate, type_list} ✅
+FOLLOW(Declaration) = 
+                    = 
 
 Declaration’ ::= Type variable equals Expression
 FIRST(Declaration’) = FIRST(FIRST(Type) ° FIRST(variable) ° FIRST(equals) ° FIRST(Expression)) ✅
                     = {type_number, type_string, type_coordinate, type_list} ✅
+FOLLOW(Declaration’) = 
+                     = 
 
-Assignment ::= hash variable equals Expression //////////////////////////////////////////////////////////////////////////// hash dodan
-FIRST(Assignment) = FIRST(FIRST(variable) ° FIRST(equals) ° FIRST(Expression)) ✅
-                  = {variable} ✅
+Assignment ::= hash variable equals Expression
+FIRST(Assignment) = FIRST(FIRST(hash) ° FIRST(variable) ° FIRST(equals) ° FIRST(Expression)) ✅
+                  = {hash} ✅
+FOLLOW(Assignment) = 
+                   = 
 
 Type ::= type_number | type_string | type_coordinate | type_list lthen Type mthen
 FIRST(Type) = FIRST(type_number) ∪ FIRST(type_string) ∪ FIRST(type_coordinate) ∪ FIRST(type_list lthen Type mthen) ✅
             = {type_number} ∪ {type_string} ∪ {type_coordinate} ∪ {type_list} ✅
+FOLLOW(Type) = 
+             = 
 
 Expression ::= Additive
 FIRST(Expression) = FIRST(Additive) ✅
                   = {plus, minus, real, variable, lbracket, lsq_bracket} ✅
+FOLLOW(Expression) = 
+                   = 
 
 Additive ::= Multiplicative Additive’
 FIRST(Additive) = FIRST(FIRST(Multiplicative) ° FIRST(Additive’)) ✅
                 = {plus, minus, real, variable, lbracket, lsq_bracket} ✅
+FOLLOW(Additive) = 
+                 = 
 
 Additive’ ::= plus Multiplicative Additive’ | minus Multiplicative Additive’ | ε
 FIRST(Additive’) = FIRST(plus Multiplicative Additive’) ∪ FIRST(minus Multiplicative Additive’) ∪ FIRST(ε) ✅
                  = {plus} ∪ {minus} ∪ {ε} ✅
+FOLLOW(Additive’) = 
+                  = 
 
 Multiplicative ::= Exponential Multiplicative’
 FIRST(Multiplicative) = FIRST(FIRST(Exponential) ° FIRST(Multiplicative’)) ✅
                       = {plus, minus, real, variable, lbracket, lsq_bracket} ✅
+FOLLOW(Multiplicative) = 
+                       = 
 
 Multiplicative’ ::= times Exponential Multiplicative’ | divide Exponential Multiplicative’ | integer-divide Exponential Multiplicative’ | ε
 FIRST(Multiplicative’) = FIRST(times Exponential Multiplicative’) ∪ FIRST(divide Exponential Multiplicative’) ∪ FIRST(integer-divide Exponential Multiplicative’) ∪ FIRST(ε) ✅
                        = {times} ∪ {divide} ∪ {integer-divide} ∪ {ε} ✅
+FOLLOW(Multiplicative’) = 
+                        = 
 
 Exponential ::= Unary Exponential’
 FIRST(Exponential) = FIRST(FIRST(Unary) ° FIRST(Exponential’)) ✅
                    = {plus, minus, real, variable, lbracket, lsq_bracket} ✅
+FOLLOW(Exponential) = 
+                    = 
 
 Exponential’ ::= pow Unary Exponential’ | ε
 FIRST(Exponential’) = FIRST(pow Unary Exponential’) ∪ FIRST(ε) ✅
                     = {pow} ∪ {ε} ✅
+FOLLOW(Exponential’) = 
+                     = 
 
 Unary ::= plus Primary | minus Primary | Primary
 FIRST(Unary) = FIRST(plus Primary) ∪ FIRST(minus Primary) ∪ FIRST(Primary) ✅
              = {plus} ∪ {minus} ∪ {real, variable, lbracket, lsq_bracket} ✅
+FOLLOW(Unary) = 
+              = 
 
 Primary ::= real | variable | lbracket Additive rbracket | lsq_bracket Inner_List rsq_bracket
 FIRST(Primary) = FIRST(real) ∪ FIRST(variable) ∪ FIRST(lbracket Additive rbracket) ∪ FIRST(lsq_bracket Inner_List rsq_bracket) ✅
                = {real} ∪ {variable} ∪ {lbracket} ∪ {lsq_bracket} ✅
+FOLLOW(Primary) = 
+                = 
 
 Inner_List ::= Inner_List’’ Inner_List’
 FIRST(Inner_List) = FIRST(FIRST(Inner_List’’) ° FIRST(Inner_List’)) ✅
                   = {plus, minus, real, variable, lbracket, lsq_bracket} ✅
+FOLLOW(Inner_List) = 
+                   = 
 
 Inner_List’ ::= comma Inner_List’’ Inner_List | ε
 FIRST(Inner_List’) = FIRST(comma Inner_List’’ Inner_List) ∪ FIRST(ε) ✅
                    = {comma} ∪ {ε} ✅
+FOLLOW(Inner_List’) = 
+                    = 
 
 Inner_List’’ ::= Expression
 FIRST(Inner_List’’) = FIRST(Expression) ✅
                     = {plus, minus, real, variable, lbracket, lsq_bracket} ✅
+FOLLOW(Inner_List’’) = 
+                     = 
 
 City ::= city variable block_start City’ block_end
 FIRST(City) = FIRST(city variable block_start City’ block_end) ✅
             = {city} ✅
+FOLLOW(City) = 
+             = 
 
 City’ ::= City’’’ City’’
 FIRST(City’) = FIRST(FIRST(City’’’) ° FIRST(City’’)) ✅
              = {name, road, const, type_number, type_string, type_coordinate, type_list, variable, print} ✅
+FOLLOW(City’) = 
+              = 
 
 City’’ ::= City’ City’’ | ε
 FIRST(City’’) = FIRST(FIRST(City’) ° FIRST(City’’)) ∪ FIRST(ε) ✅
               = {name, road, const, type_number, type_string, type_coordinate, type_list, variable, print} ∪ {ε} ✅
+FOLLOW(City’’) = 
+               = 
 
 City’’’ ::= City_Constructs | Declaration | Assignment | Print
 FIRST(City’’’) = FIRST(City_Constructs) ∪ FIRST(Declaration) ∪ FIRST(Assignment) ∪ FIRST(Print) ✅
                = {name, road} ∪ {const, type_number, type_string, type_coordinate, type_list} ∪ {variable} ∪ {print} ✅
+FOLLOW(City’’’) = 
+                = 
 
 Print ::= print lbracket Expression rbracket
 FIRST(Print) = FIRST(FIRST(print) ° FIRST(lbracket) ° FIRST(Expression) ° FIRST(rbracket)) ✅
              = {print} ✅
+FOLLOW(Print) = 
+              = 
 
 City_Constructs ::= Restaurant | Road
 FIRST(City_Constructs) = FIRST(Restaurant) ∪ FIRST(Road) ✅
                        = {name} ∪ {road} ✅
+FOLLOW(City_Constructs) = 
+                        = 
 
 Restaurant ::= Name Shape Marker Routes
 FIRST(Restaurant) = FIRST(FIRST(Name) ° FIRST(Shape) ° FIRST(Marker) ° FIRST(Routes)) ✅
                   = {name} ✅
+FOLLOW(Restaurant) = 
+                   = 
 
 Name ::= name colon String
 FIRST(Name) = FIRST(name colon String) ✅
             = {name} ✅
+FOLLOW(Name) = 
+             = 
 
 String ::= variable | string
 FIRST(String) = FIRST(variable) ∪ FIRST(string) ✅
               = {variable} ∪ {string} ✅
+FOLLOW(String) = 
+               = 
 
 Shape ::= shape colon block_start Lines block_end
 FIRST(Shape) = FIRST(shape colon block_start Lines block_end) ✅
              = {shape} ✅
+FOLLOW(Shape) = 
+              = 
 
 Lines ::= Line Line Line Line’
 FIRST(Lines) = FIRST(FIRST(Line) ° FIRST(Line) ° FIRST(Line) ° FIRST(Line’)) ✅
              = {line} ✅
+FOLLOW(Lines) = 
+              = 
 
 Line’ ::= Line Line’ | ε 
 FIRST(Line’) = FIRST(FIRST(Line) ° FIRST(Line’)) ∪ FIRST(ε) ✅
              = {line} ∪ ε ✅
+FOLLOW(Line’) = 
+              = 
 
 Line ::= line lsq_bracket Coord comma Coord rsq_bracket
 FIRST(Line) = FIRST(line lsq_bracket Coord comma Coord rsq_bracket) ✅
             = {line} ✅
+FOLLOW(Line) = 
+             = 
 
 Coord ::= variable | lbracket Expression comma Expression rbracket
 FIRST(Coord) = FIRST(variable) ∪ FIRST(lbracket Expression comma Expression rbracket) ✅
              = {variable} ∪ {lbracket} ✅
+FOLLOW(Coord) = 
+              = 
 
 Marker ::= Marker’ | ε
 FIRST(Marker) = FIRST(Marker’) ∪ FIRST(ε) ✅
               = {marker} ∪ ε ✅
+FOLLOW(Marker) = 
+               = 
 
 Marker’ ::= marker colon Point
 FIRST(Marker’) = FIRST(marker colon Point) ✅
                = {marker} ✅
+FOLLOW(Marker’) = 
+                = 
 
 Point ::= point lsq_bracket Coord rsq_bracket
 FIRST(Point) = FIRST(point lsq_bracket Coord rsq_bracket)
              = {point} ✅
+FOLLOW(Point) = 
+              = 
 
 Routes ::= Routes’ | ε
 FIRST(Routes) = FIRST(Routes’) ∪ FIRST(ε) ✅
               = {routes} ∪ {ε} ✅
+FOLLOW(Routes) = 
+               = 
 
 Routes’ ::= routes colon lsq_bracket Roads rsq_bracket
 FIRST(Routes’) = FIRST(routes colon lsq_bracket Roads rsq_bracket) ✅
                = {routes} ✅
+FOLLOW(Routes’) = 
+                = 
 
 Roads ::= Road Road’
 FIRST(Roads) = FIRST(FIRST(Road) ° FIRST(Road’)) ✅
              = {road} ✅
+FOLLOW(Roads) = 
+              = 
 
 Road’ ::= comma Road Roads’ | ε
 FIRST(Road’) = FIRST(comma Road Roads’) ∪ FIRST(ε) ✅
              = {comma} ∪ {ε} ✅
+FOLLOW(Road’) = 
+              = 
 
 Road ::= road variable block_start Name Road_Shapes block_end
 FIRST(Road) = FIRST(road variable block_start Name Road_Shapes block_end) ✅
