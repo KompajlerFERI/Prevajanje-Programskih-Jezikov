@@ -8,11 +8,16 @@ Main_Program’’ ::= For
 Declaration ::= const Declaration’
 Declaration ::= Declaration’
 Declaration’ ::= Type variable equals Expression
+Declaration’ ::= List variable equals ListContent
 Assignment ::= hash variable equals Expression
+List ::= type_list lthen Type mthan
+ListContent ::= lsq_bracket Inner_List rsq_bracket
+Inner_List ::= Expression Inner_List’
+Inner_List’ ::= comma Expression Inner_List’
+Inner_List’ ::= ''
 Type ::= type_number
 Type ::= type_string
 Type ::= type_coordinate
-Type ::= type_list lthen Type mthen
 Expression ::= Additive
 Additive ::= Multiplicative Additive’
 Additive’ ::= plus Multiplicative Additive’
@@ -32,10 +37,6 @@ Unary ::= Primary
 Primary ::= real
 Primary ::= variable
 Primary ::= lbracket Additive rbracket
-Primary ::= lsq_bracket Inner_List rsq_bracket
-Inner_List ::= Expression Inner_List’
-Inner_List’ ::= comma Expression Inner_List’
-Inner_List’ ::= ''
 City ::= city variable block_start City’ block_end semicol
 City’ ::= City’’’ semicol City’’
 City’’ ::= City’ semicol City’’
@@ -89,14 +90,14 @@ Program’’ ::= Highlight
 Highlight ::= highlight lbracket variable rbracket 
 
 const -> const
-variable -> {A,…,Z,a,…,z}{A,…,Z,a,…,z,0,…,9}*
+variable -> {A,…,Z,a,…,z,_}{A,…,Z,a,…,z,0,…,9,_}*
 equals -> =
 type_number -> num
 type_string -> string
 type_coordinate -> coord
-type_list -> List
-lthen -> <
-mthen -> >
+type_list -> list
+lthan -> <
+mthan -> >
 city -> city
 block_start -> {
 block_end -> }
@@ -119,3 +120,12 @@ foreach-> foreach
 highlight -> highlight
 semicol -> ;
 hash -> #
+real -> {0,…,9}+(.{0,…,9}+)?
+plus -> +
+minus -> -
+times -> *
+divide -> /
+integer-divide -> //
+pow -> ^
+print -> print
+in -> in
