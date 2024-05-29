@@ -1,0 +1,5 @@
+const num spremenljivka = 14;
+const num spremenljivka = 14.421;
+string spremenljivka2 = "restavracija";
+coord coordinate = (46.245267, 15.234526);
+list<tip> name = [];

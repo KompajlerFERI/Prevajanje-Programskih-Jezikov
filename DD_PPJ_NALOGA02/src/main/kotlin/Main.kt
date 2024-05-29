@@ -1,5 +1,6 @@
 import java.io.InputStream
 import java.io.File
+import java.io.FileOutputStream
 
 const val ERROR_STATE = 0
 
@@ -42,7 +43,7 @@ enum class Symbol {
     MINUS,
     TIMES,
     DIVIDES,
-    INTIGERDIVIDES,
+    INTEGERDIVIDES,
     POW,
     PRINT,
     IN
@@ -63,10 +64,23 @@ interface DFA {
 }
 
 object ForForeachFFFAutomaton: DFA {
-    override val states = (1 .. 32).toSet()
+    override val states = (1 .. 119).toSet()
     override val alphabet = 0 .. 255
     override val startState = 1
-    override val finalStates = setOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27)
+    override val finalStates = setOf(
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+        31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+        51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+        61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
+        71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+        81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
+        91, 92, 93, 94, 95, 96, 97, 98, 99, 100,
+        101, 102, 103, 104, 105, 106, 107, 108, 109, 110,
+        111, 112, 113, 114, 115, 116, 117, 118, 119
+    )
     private val numberOfStates = states.max() + 1 // plus the ERROR_STATE
     private val numberOfCodes = alphabet.max() + 1 // plus the EOF
     private val transitions = Array(numberOfStates) {IntArray(numberOfCodes)}
@@ -185,9 +199,9 @@ object ForForeachFFFAutomaton: DFA {
             setTransition(1, i+97, 28)
         }
         //{A..Za..z_}
-        setTransition(1, '_', 29)
+        setTransition(1, '_', 28)
 
-        // list_____________________________________
+        //const______________________________________
             setTransition(1, 'c', 30)
                 //c{A..Z}
                 for (i in 0 until 26) {
@@ -1507,29 +1521,71 @@ object ForForeachFFFAutomaton: DFA {
                 }
 
         //^"[A-Za-z0-9\s\S]*"$_______________________
-            setTransition(1, )
+            setTransition(1, '"', 118)
+                //"{A..Z}
+                for (i in 0 until 26) {
+                    setTransition(118, i+65, 119)
+                }
+                //"{a..z}
+                for (i in 0 until 26) {
+                    setTransition(118, i+97, 119)
+                }
+                //"{0..9}
+                for (i in 0 until 10) {
+                    setTransition(118, i+48, 119)
+                }
+                //"{\s}
+                for (i in 0 until 15) {
+                    setTransition(118, i+32, 119)
+                }
+                //"{\n\t}
+                setTransition(118, '\n', 119)
+                setTransition(118, '\t', 119)
+
+            //"{A..Z}+
+            for (i in 0 until 26) {
+                setTransition(119, i+65, 119)
+            }
+            //"{a..z}+
+            for (i in 0 until 26) {
+                setTransition(119, i+97, 119)
+            }
+            //"{0..9}+
+            for (i in 0 until 10) {
+                setTransition(119, i+48, 119)
+            }
+            //"{\s}+
+            for (i in 0 until 15) {
+                setTransition(119, i+32, 119)
+            }
+            //"{\n\t}+
+            setTransition(119, '\n', 119)
+            setTransition(119, '\t', 119)
+
 
         //______________________________________
         //{A..Z}+
         for (i in 0 until 26) {
-            setTransition(13, i+65, 13)
+            setTransition(28, i+65, 28)
         }
         //{A..Za..z}+
         for (i in 0 until 26) {
-            setTransition(13, i+97, 13)
+            setTransition(28, i+97, 28)
         }
         //{A..Za..z}+{0..9}
         for (i in 0 until 10) {
-            setTransition(13, i+48, 14)
+            setTransition(28, i+48, 29)
         }
         //{A..Za..z}+{0..9}+
         for (i in 0 until 10) {
-            setTransition(14, i+48, 14)
+            setTransition(29, i+48, 29)
         }
 
 
 
 
+
+        //______________________________________
         setSymbol(2, Symbol.REAL)
         setSymbol(4, Symbol.REAL)
         setSymbol(5, Symbol.LTHAN)
@@ -1548,13 +1604,105 @@ object ForForeachFFFAutomaton: DFA {
         setSymbol(18, Symbol.MINUS)
         setSymbol(19, Symbol.TIMES)
         setSymbol(20, Symbol.DIVIDES)
-        setSymbol(21, Symbol.INTIGERDIVIDES)
+        setSymbol(21, Symbol.INTEGERDIVIDES)
         setSymbol(22, Symbol.POW)
         setSymbol(23, Symbol.SKIP)
         setSymbol(24, Symbol.SKIP)
         setSymbol(25, Symbol.SKIP)
         setSymbol(26, Symbol.SKIP)
         setSymbol(27, Symbol.EOF)
+
+        setSymbol(28, Symbol.VARIABLE)
+        setSymbol(29, Symbol.VARIABLE)
+        setSymbol(30, Symbol.VARIABLE)
+        setSymbol(31, Symbol.VARIABLE)
+        setSymbol(32, Symbol.VARIABLE)
+        setSymbol(33, Symbol.VARIABLE)
+        setSymbol(34, Symbol.CONST)
+        setSymbol(35, Symbol.VARIABLE)
+        setSymbol(36, Symbol.VARIABLE)
+        setSymbol(37, Symbol.TYPE_NUMBER)
+        setSymbol(38, Symbol.VARIABLE)
+        setSymbol(39, Symbol.VARIABLE)
+        setSymbol(40, Symbol.VARIABLE)
+        setSymbol(41, Symbol.VARIABLE)
+        setSymbol(42, Symbol.VARIABLE)
+        setSymbol(43, Symbol.TYPE_STRING)
+        setSymbol(44, Symbol.VARIABLE)
+        setSymbol(45, Symbol.VARIABLE)
+        setSymbol(46, Symbol.VARIABLE)
+        setSymbol(47, Symbol.VARIABLE)
+        setSymbol(48, Symbol.TYPE_COORDINATE)
+        setSymbol(49, Symbol.VARIABLE)
+        setSymbol(50, Symbol.VARIABLE)
+        setSymbol(51, Symbol.VARIABLE)
+        setSymbol(52, Symbol.TYPE_LIST)
+        setSymbol(53, Symbol.VARIABLE)
+        setSymbol(54, Symbol.VARIABLE)
+        setSymbol(55, Symbol.VARIABLE)
+        setSymbol(56, Symbol.CITY)
+        setSymbol(57, Symbol.VARIABLE)
+        setSymbol(58, Symbol.VARIABLE)
+        setSymbol(59, Symbol.VARIABLE)
+        setSymbol(60, Symbol.NAME)
+        setSymbol(61, Symbol.VARIABLE)
+        setSymbol(62, Symbol.VARIABLE)
+        setSymbol(63, Symbol.VARIABLE)
+        setSymbol(64, Symbol.VARIABLE)
+        setSymbol(65, Symbol.SHAPE)
+        setSymbol(66, Symbol.VARIABLE)
+        setSymbol(67, Symbol.VARIABLE)
+        setSymbol(68, Symbol.VARIABLE)
+        setSymbol(69, Symbol.LINE)
+        setSymbol(70, Symbol.VARIABLE)
+        setSymbol(71, Symbol.VARIABLE)
+        setSymbol(72, Symbol.VARIABLE)
+        setSymbol(73, Symbol.VARIABLE)
+        setSymbol(74, Symbol.VARIABLE)
+        setSymbol(75, Symbol.MARKER)
+        setSymbol(76, Symbol.VARIABLE)
+        setSymbol(77, Symbol.VARIABLE)
+        setSymbol(78, Symbol.VARIABLE)
+        setSymbol(79, Symbol.VARIABLE)
+        setSymbol(80, Symbol.POINT)
+        setSymbol(81, Symbol.VARIABLE)
+        setSymbol(82, Symbol.VARIABLE)
+        setSymbol(83, Symbol.VARIABLE)
+        setSymbol(84, Symbol.VARIABLE)
+        setSymbol(85, Symbol.VARIABLE)
+        setSymbol(86, Symbol.ROUTES)
+        setSymbol(87, Symbol.VARIABLE)
+        setSymbol(88, Symbol.VARIABLE)
+        setSymbol(89, Symbol.VARIABLE)
+        setSymbol(90, Symbol.ROAD)
+        setSymbol(91, Symbol.VARIABLE)
+        setSymbol(92, Symbol.VARIABLE)
+        setSymbol(93, Symbol.VARIABLE)
+        setSymbol(94, Symbol.BEND)
+        setSymbol(95, Symbol.VARIABLE)
+        setSymbol(96, Symbol.VARIABLE)
+        setSymbol(97, Symbol.VARIABLE)
+        setSymbol(98, Symbol.VARIABLE)
+        setSymbol(99, Symbol.VARIABLE)
+        setSymbol(100, Symbol.VARIABLE)
+        setSymbol(101, Symbol.VARIABLE)
+        setSymbol(102, Symbol.VARIABLE)
+        setSymbol(103, Symbol.HIGHLIGHT)
+        setSymbol(104, Symbol.VARIABLE)
+        setSymbol(105, Symbol.VARIABLE)
+        setSymbol(106, Symbol.VARIABLE)
+        setSymbol(107, Symbol.VARIABLE)
+        setSymbol(108, Symbol.VARIABLE)
+        setSymbol(109, Symbol.VARIABLE)
+        setSymbol(110, Symbol.FOREACH)
+        setSymbol(111, Symbol.VARIABLE)
+        setSymbol(112, Symbol.VARIABLE)
+        setSymbol(113, Symbol.VARIABLE)
+        setSymbol(114, Symbol.VARIABLE)
+        setSymbol(115, Symbol.PRINT)
+        setSymbol(116, Symbol.VARIABLE)
+        setSymbol(117, Symbol.IN)
+        setSymbol(119, Symbol.STRING)
 
     }
 }
@@ -1606,103 +1754,66 @@ class Scanner(private val automaton: DFA, private val stream: InputStream) {
         }
     }
 }
-class Parser(private val lex: Scanner) {
-    private var token = lex.getToken()
 
-    fun EXPR(): Boolean {
-        return ADDITIVE()
+fun name(symbol: Symbol) =
+    when (symbol) {
+        Symbol.CONST -> "const"
+        Symbol.VARIABLE -> "variable"
+        Symbol.EQUALS -> "equals"
+        Symbol.TYPE_NUMBER -> "type_number"
+        Symbol.TYPE_STRING -> "type_string"
+        Symbol.TYPE_COORDINATE -> "type_coordinate"
+        Symbol.TYPE_LIST -> "type_list"
+        Symbol.LTHAN -> "lthan"
+        Symbol.MTHAN -> "mthan"
+        Symbol.CITY -> "city"
+        Symbol.BLOCK_START -> "block_start"
+        Symbol.BLOCK_END -> "block_end"
+        Symbol.NAME -> "name"
+        Symbol.COLON -> "colon"
+        Symbol.STRING -> "string"
+        Symbol.SHAPE -> "shape"
+        Symbol.LINE -> "line"
+        Symbol.LSQ_BRACKET -> "lsq_bracket"
+        Symbol.COMMA -> "comma"
+        Symbol.RSQ_BRACKET -> "rsq_bracket"
+        Symbol.LBRACKET -> "lbracket"
+        Symbol.RBRACKET -> "rbracket"
+        Symbol.MARKER -> "marker"
+        Symbol.POINT -> "point"
+        Symbol.ROUTES -> "routes"
+        Symbol.ROAD -> "road"
+        Symbol.BEND -> "bend"
+        Symbol.FOREACH -> "foreach"
+        Symbol.HIGHLIGHT -> "highlight"
+        Symbol.SEMICOL -> "semicol"
+        Symbol.HASH -> "hash"
+        Symbol.REAL -> "real"
+        Symbol.PLUS -> "plus"
+        Symbol.MINUS -> "minus"
+        Symbol.TIMES -> "times"
+        Symbol.DIVIDES -> "divide"
+        Symbol.INTEGERDIVIDES -> "integer-divide"
+        Symbol.POW -> "pow"
+        Symbol.PRINT -> "print"
+        Symbol.IN -> "in"
+        else -> throw Error("Invalid symbol")
     }
 
-    fun ADDITIVE(): Boolean {
-        return MULTIPlicative() && ADDITIVE_PRIME()
+
+fun printTokens(scanner: Scanner, output: FileOutputStream) {
+    val writer = output.writer(Charsets.UTF_8)
+
+    var token = scanner.getToken()
+    while (token.symbol != Symbol.EOF) {
+        writer.append("${name(token.symbol)}(\"${token.lexeme}\") ") // The output ends with a space!
+        token = scanner.getToken()
     }
 
-    fun ADDITIVE_PRIME(): Boolean {
-        if (token.symbol == Symbol.PLUS || token.symbol == Symbol.MINUS) {
-            token = lex.getToken()
-            return MULTIPlicative() && ADDITIVE_PRIME()
-        }
-        return true
-    }
-
-    fun MULTIPlicative(): Boolean {
-        return EXPONENTIAL() && MULTIPlicative_PRIME()
-    }
-
-    fun MULTIPlicative_PRIME(): Boolean {
-        if (token.symbol == Symbol.TIMES || token.symbol == Symbol.DIVIDES || token.symbol == Symbol.INTIGERDIVIDES) {
-            token = lex.getToken()
-            return EXPONENTIAL() && MULTIPlicative_PRIME()
-        }
-        return true
-    }
-
-    fun EXPONENTIAL(): Boolean {
-        return UNARY() && EXPONENTIAL_PRIME()
-    }
-
-    fun EXPONENTIAL_PRIME(): Boolean {
-        if (token.symbol == Symbol.POW) {
-            token = lex.getToken()
-            return UNARY() && EXPONENTIAL_PRIME()
-        }
-        return true
-    }
-
-    fun UNARY(): Boolean {
-        if (token.symbol == Symbol.PLUS || token.symbol == Symbol.MINUS) {
-            token = lex.getToken()
-            return PRIMARY()
-        } else {
-            return PRIMARY()
-        }
-    }
-
-    fun PRIMARY(): Boolean {
-        return when (token.symbol) {
-            Symbol.REAL -> {
-                token = lex.getToken()
-                true
-            }
-            Symbol.VARIABLE -> {
-                token = lex.getToken()
-                true
-            }
-            Symbol.LBRACKET -> {
-                token = lex.getToken()
-                val result = EXPR()
-                if (token.symbol == Symbol.RBRACKET) {
-                    token = lex.getToken()
-                    result
-                } else {
-                    false
-                }
-            }
-            else -> false
-        }
-    }
-
-    fun PARSE(): Boolean {
-        val result = EXPR()
-        return result && token.symbol == Symbol.EOF
-    }
+    writer.appendLine()
+    writer.flush()
 }
 
-
 fun main(args: Array<String>) {
-    if (args.size != 2) {
-        println("Usage: <input_file_name> <output_file_name>")
-        return
-    }
-
-    val fileInputName = args[0]
-    val fileOutputName = args[1]
-    val file = File(fileInputName)
-    val fileOutput = File(fileOutputName)
-
-    val lex = Scanner(ForForeachFFFAutomaton, file.inputStream())
-    val parser = Parser(lex)
-
-    val result = parser.PARSE()
-    fileOutput.writeText(if (result) "accept" else "reject")
+    printTokens(Scanner(ForForeachFFFAutomaton, File(args[0]).inputStream()), File(args[1]).outputStream())
 }
