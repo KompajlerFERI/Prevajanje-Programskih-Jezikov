@@ -48,7 +48,7 @@ City’’’ ::= Print
 Print ::= print lbracket Expression rbracket
 City_Constructs ::= Restaurant
 City_Constructs ::= Road
-Restaurant ::= Name Shape Marker Routes
+Restaurant ::= restaurant variable block_start Name Shape Marker Routes block_end
 Name ::= name colon String
 String ::= variable
 String ::= string
@@ -129,3 +129,4 @@ integer-divide -> //
 pow -> ^
 print -> print
 in -> in
+restaurant -> restaurant
