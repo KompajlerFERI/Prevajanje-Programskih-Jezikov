@@ -46,7 +46,8 @@ enum class Symbol {
     INTEGERDIVIDES,
     POW,
     PRINT,
-    IN
+    IN,
+    DOT
 }
 
 
@@ -64,7 +65,7 @@ interface DFA {
 }
 
 object ForForeachFFFAutomaton: DFA {
-    override val states = (1 .. 119).toSet()
+    override val states = (1 .. 121).toSet()
     override val alphabet = 0 .. 255
     override val startState = 1
     override val finalStates = setOf(
@@ -79,7 +80,8 @@ object ForForeachFFFAutomaton: DFA {
         81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
         91, 92, 93, 94, 95, 96, 97, 98, 99, 100,
         101, 102, 103, 104, 105, 106, 107, 108, 109, 110,
-        111, 112, 113, 114, 115, 116, 117, 118, 119
+        111, 112, 113, 114, 115, 116, 117, 118, 119, 120,
+        121
     )
     private val numberOfStates = states.max() + 1 // plus the ERROR_STATE
     private val numberOfCodes = alphabet.max() + 1 // plus the EOF
@@ -494,7 +496,7 @@ object ForForeachFFFAutomaton: DFA {
                 }
                 //l{a..z} / i
                 for (i in 0 until 26) {
-                    if (i+97 == 110) continue // skip i
+                    if (i+97 == 105) continue // skip i
                     setTransition(49, i+97, 28)
                 }
                 //l{0..9}
@@ -1581,6 +1583,10 @@ object ForForeachFFFAutomaton: DFA {
             setTransition(29, i+48, 29)
         }
 
+        // =
+        setTransition(1, '=', 120)
+        // .
+        setTransition(1, '.', 121)
 
 
 
@@ -1611,6 +1617,8 @@ object ForForeachFFFAutomaton: DFA {
         setSymbol(25, Symbol.SKIP)
         setSymbol(26, Symbol.SKIP)
         setSymbol(27, Symbol.EOF)
+        setSymbol(120, Symbol.EQUALS)
+        setSymbol(121, Symbol.DOT)
 
         setSymbol(28, Symbol.VARIABLE)
         setSymbol(29, Symbol.VARIABLE)
@@ -1797,6 +1805,7 @@ fun name(symbol: Symbol) =
         Symbol.POW -> "pow"
         Symbol.PRINT -> "print"
         Symbol.IN -> "in"
+        Symbol.DOT -> "dot"
         else -> throw Error("Invalid symbol")
     }
 
