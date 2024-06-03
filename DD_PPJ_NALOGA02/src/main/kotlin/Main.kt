@@ -47,7 +47,8 @@ enum class Symbol {
     PRINT,
     IN,
     DOT,
-    RESTAURANT
+    RESTAURANT,
+    RADIUS
 }
 
 
@@ -65,7 +66,7 @@ interface DFA {
 }
 
 object ForForeachFFFAutomaton: DFA {
-    override val states = (1 .. 121).toSet()
+    override val states = (1 .. 126).toSet()
     override val alphabet = 0 .. 255
     override val startState = 1
     override val finalStates = setOf(
@@ -81,7 +82,7 @@ object ForForeachFFFAutomaton: DFA {
         91, 92, 93, 94, 95, 96, 97, 98, 99, 100,
         101, 102, 103, 104, 105, 106, 107, 108, 109, 110,
         111, 112, 113, 114, 115, 116, 117, 118, 119, 120,
-        121
+        121, 122, 123, 124, 125, 126
     )
     private val numberOfStates = states.max() + 1 // plus the ERROR_STATE
     private val numberOfCodes = alphabet.max() + 1 // plus the EOF
@@ -1319,7 +1320,7 @@ object ForForeachFFFAutomaton: DFA {
                         setTransition(99, i+48, 29)
                     }
 
-        //routes______________________________________
+        //routes, road, restaurant, radius_____________________________________
             setTransition(1, 'r', 100)
                 //r{A..Z}
                 for (i in 0 until 26) {
@@ -1576,6 +1577,81 @@ object ForForeachFFFAutomaton: DFA {
                     setTransition(116, i+48, 29)
                 }
 
+            //radius
+                setTransition(100, 'a', 122)
+                //ra{A..Z}
+                for (i in 0 until 26) {
+                    setTransition(122, i+65, 28)
+                }
+                //ra{a..z} / d
+                for (i in 0 until 26) {
+                    if (i+97 == 100) continue // skip d
+                    setTransition(122, i+97, 28)
+                }
+                //ra{0..9}
+                for (i in 0 until 10) {
+                    setTransition(122, i+48, 29)
+                }
+
+                setTransition(122, 'd', 123)
+                //rad{A..Z}
+                for (i in 0 until 26) {
+                    setTransition(123, i+65, 28)
+                }
+                //rad{a..z}
+                for (i in 0 until 26) {
+                    if (i+97 == 105) continue // skip i
+                    setTransition(123, i+97, 28)
+                }
+                //rad{0..9}
+                for (i in 0 until 10) {
+                    setTransition(123, i+48, 29)
+                }
+
+                setTransition(123, 'i', 124)
+                //radi{A..Z}
+                for (i in 0 until 26) {
+                    setTransition(124, i+65, 28)
+                }
+                //radi{a..z}
+                for (i in 0 until 26) {
+                    if (i+97 == 117) continue // skip u
+                    setTransition(124, i+97, 28)
+                }
+                //radi{0..9}
+                for (i in 0 until 10) {
+                    setTransition(124, i+48, 29)
+                }
+
+                setTransition(124, 'u', 125)
+                //radiu{A..Z}
+                for (i in 0 until 26) {
+                    setTransition(125, i+65, 28)
+                }
+                //radiu{a..z}
+                for (i in 0 until 26) {
+                    if (i+97 == 115) continue // skip s
+                    setTransition(125, i+97, 28)
+                }
+                //radiu{0..9}
+                for (i in 0 until 10) {
+                    setTransition(125, i+48, 29)
+                }
+
+                setTransition(125, 's', 126)
+                //radius{A..Z}
+                for (i in 0 until 26) {
+                    setTransition(126, i+65, 28)
+                }
+                //radius{a..z}
+                for (i in 0 until 26) {
+                    setTransition(126, i+97, 28)
+                }
+                //radius{0..9}
+                for (i in 0 until 10) {
+                    setTransition(126, i+48, 29)
+                }
+
         //______________________________________
         //{A..Z}+
         for (i in 0 until 26) {
@@ -1593,6 +1669,8 @@ object ForForeachFFFAutomaton: DFA {
         for (i in 0 until 10) {
             setTransition(29, i+48, 29)
         }
+        //{A..Za..z_}+{0..9}+
+        setTransition(28, '_', 28)
 
         // =
         setTransition(1, '=', 117)
@@ -1741,6 +1819,12 @@ object ForForeachFFFAutomaton: DFA {
 
         setSymbol(117, Symbol.EQUALS)
         setSymbol(118, Symbol.DOT)
+
+        setSymbol(122, Symbol.VARIABLE)
+        setSymbol(123, Symbol.VARIABLE)
+        setSymbol(124, Symbol.VARIABLE)
+        setSymbol(125, Symbol.VARIABLE)
+        setSymbol(126, Symbol.RADIUS)
     }
 }
 
@@ -1967,20 +2051,20 @@ class Parser(private val lex: Scanner) {
     private var token = lex.getToken() // tega vzame že, ko se kliče
 
     fun MAIN_PROGRAM(): Boolean {
-        val result = MAIN_PROGRAM_PRIME_PRIME()
-        if (result && token.symbol == Symbol.SEMICOL) {
-            token = lex.getToken()
-            return MAIN_PROGRAM_PRIME()
-        } else {
-            return false
+        if (MAIN_PROGRAM_PRIME_PRIME()) {
+            if (token.symbol == Symbol.SEMICOL) {
+                token = lex.getToken()
+                return MAIN_PROGRAM_PRIME()
+            }
         }
+        return false
     }
 
     fun MAIN_PROGRAM_PRIME(): Boolean {
         if (MAIN_PROGRAM()) {
             return true
         } else {
-            return false
+            return true
         }
     }
 
@@ -2246,28 +2330,20 @@ class Parser(private val lex: Scanner) {
     }
 
     fun CITY_PRIME(): Boolean {
-        if (CITY_PRIME_PRIME()) {
+        if (CITY_PRIME_PRIME_PRIME()) {
             if (token.symbol == Symbol.SEMICOL) {
                 token = lex.getToken()
-                return CITY_PRIME()
+                return CITY_PRIME_PRIME()
             }
         }
-        return true
+        return false
     }
 
     fun CITY_PRIME_PRIME(): Boolean {
-        if (CITY_CONSTRUCTS()) {
-            return true
-        } else if (DECLARATION()) {
-            return true
-        } else if (ASSIGNMENT()) {
-            return true
-        } else if (PRINT()) {
-            return true
-        } else if (HIGHLIGHT()) {
+        if (CITY_PRIME()) {
             return true
         } else {
-            return false
+            return true
         }
     }
 
@@ -2279,6 +2355,8 @@ class Parser(private val lex: Scanner) {
         } else if (ASSIGNMENT()) {
             return true
         } else if (PRINT()) {
+            return true
+        } else if (FOR()) {
             return true
         } else {
             return false
@@ -2458,7 +2536,7 @@ class Parser(private val lex: Scanner) {
         if (MARKER_PRIME()) {
             return true
         }
-        return false
+        return true
     }
 
     fun MARKER_PRIME(): Boolean {
@@ -2494,7 +2572,7 @@ class Parser(private val lex: Scanner) {
         if (ROUTES_PRIME()) {
             return true
         }
-        return false
+        return true
     }
 
     fun ROUTES_PRIME(): Boolean {
@@ -2562,21 +2640,23 @@ class Parser(private val lex: Scanner) {
                 if (token.symbol == Symbol.BLOCK_START) {
                     token = lex.getToken()
                     if (ROAD_SHAPES_PRIME()) {
-                        if (token.symbol == Symbol.BLOCK_END) {
-                            token = lex.getToken()
-                            return true
+                        if (ROAD_SHAPES()) {
+                            if (token.symbol == Symbol.BLOCK_END) {
+                                token = lex.getToken()
+                                return true
+                            }
                         }
                     }
                 }
             }
         }
-        return false
+        return true
     }
 
     fun ROAD_SHAPES_PRIME(): Boolean {
-        if (ROAD_SHAPE()) {
-            if (token.symbol == Symbol.SEMICOL) {
-                token = lex.getToken()
+        if (token.symbol == Symbol.HASH) {
+            token = lex.getToken()
+            if (ROAD_SHAPE()) {
                 return ROAD_SHAPES_PRIME()
             }
         }
@@ -2593,23 +2673,20 @@ class Parser(private val lex: Scanner) {
     }
 
     fun BEND(): Boolean {
-        if (token.symbol == Symbol.HASH) {
+        if (token.symbol == Symbol.BEND) {
             token = lex.getToken()
-            if (token.symbol == Symbol.BEND) {
+            if (token.symbol == Symbol.LSQ_BRACKET) {
                 token = lex.getToken()
-                if (token.symbol == Symbol.LSQ_BRACKET) {
-                    token = lex.getToken()
-                    if (COORD()) {
-                        if (token.symbol == Symbol.COMMA) {
-                            token = lex.getToken()
-                            if (COORD()) {
-                                if (token.symbol == Symbol.COMMA) {
-                                    token = lex.getToken()
-                                    if (EXPRESSION()) {
-                                        if (token.symbol == Symbol.RSQ_BRACKET) {
-                                            token = lex.getToken()
-                                            return true
-                                        }
+                if (COORD()) {
+                    if (token.symbol == Symbol.COMMA) {
+                        token = lex.getToken()
+                        if (COORD()) {
+                            if (token.symbol == Symbol.COMMA) {
+                                token = lex.getToken()
+                                if (EXPRESSION()) {
+                                    if (token.symbol == Symbol.RSQ_BRACKET) {
+                                        token = lex.getToken()
+                                        return true
                                     }
                                 }
                             }
@@ -2646,29 +2723,47 @@ class Parser(private val lex: Scanner) {
     }
 
     fun VARIABLE(): Boolean {
-        return when (token.symbol) {
-            Symbol.VARIABLE -> {
-                token = lex.getToken()
-                true
-            }
-            Symbol.RSQ_BRACKET -> {
-                token = lex.getToken()
-                true
-            }
-            else -> false
+        if (token.symbol == Symbol.VARIABLE) {
+            token = lex.getToken()
+            return VARIABLE_PRIME()
+        } else if (RADIUS()) {
+            return true
         }
+        return false
+    }
+
+    fun VARIABLE_PRIME(): Boolean {
+        if (token.symbol == Symbol.DOT) {
+            token = lex.getToken()
+            return VARIABLE_PRIME_PRIME()
+        }
+        return true
+    }
+
+    fun VARIABLE_PRIME_PRIME(): Boolean {
+        if (token.symbol == Symbol.VARIABLE) {
+            token = lex.getToken()
+            return true
+        } else if (token.symbol == Symbol.ROUTES) {
+            token = lex.getToken()
+            return true
+        }
+        return false
     }
 
     fun RADIUS(): Boolean {
-        if (token.symbol == Symbol.LSQ_BRACKET) {
+        if (token.symbol == Symbol.RADIUS) {
             token = lex.getToken()
-            if (COORD()) {
-                if (token.symbol == Symbol.COMMA) {
-                    token = lex.getToken()
-                    if (EXPRESSION()) {
-                        if (token.symbol == Symbol.RSQ_BRACKET) {
-                            token = lex.getToken()
-                            return true
+            if (token.symbol == Symbol.LSQ_BRACKET) {
+                token = lex.getToken()
+                if (COORD()) {
+                    if (token.symbol == Symbol.COMMA) {
+                        token = lex.getToken()
+                        if (EXPRESSION()) {
+                            if (token.symbol == Symbol.RSQ_BRACKET) {
+                                token = lex.getToken()
+                                return true
+                            }
                         }
                     }
                 }
@@ -2688,10 +2783,8 @@ class Parser(private val lex: Scanner) {
     }
 
     fun PROGRAM_PRIME(): Boolean {
-        val result = PROGRAM()
-        if (result && token.symbol == Symbol.SEMICOL) {
-            token = lex.getToken()
-            return PROGRAM_PRIME()
+        if (PROGRAM()) {
+            return true
         }
         return true
     }
