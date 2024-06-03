@@ -1,0 +1,91 @@
+const num spr = 0 ;
+const num spr = 0 ;
+string spr = a ;
+coord spr = ( 0 , 0 ) ;
+list < string > spr = [ ] ;
+
+# spr = coord ( 0 , 0 ) ;
+
+city spr {
+    restaurant spr {
+        name : a
+        shape : {
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+        }
+        marker : point [ ( 0 , 0 ) ]
+        routes : [
+            road spr {
+                name : a
+                shape : {
+                    # line [ spr , ( 0 , 0 ) ]
+                    # bend [ ( 0 , 0 ) , ( 0 , 0 ) , 0 ]
+                    # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+                    # bend [ ( 0 , 0 ) , spr , 0 ]
+                    # bend [ ( 0 , 0 ) , ( 0 , 0 ) , 0 ]
+                }
+            } ,
+            road spr {
+                name : a
+                shape : {
+                    # bend [ ( 0 , 0 ) , ( 0 , 0 ) , 0 ]
+                    # bend [ ( 0 , 0 ) , ( 0 , 0 ) , 0 ]
+                    # line [ ( 0 , 0 ) , spr ]
+                    # bend [ ( 0 , 0 ) , ( 0 , 0 ) , spr ]
+                }
+            }
+        ]
+    } ;
+
+
+    restaurant spr {
+        name : a
+        shape : {
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+        }
+    } ;
+
+
+    restaurant spr {
+        name :
+        a shape : {
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+        }
+        marker : point [ ( 0 , 0 ) ]
+    } ;
+
+    num spr = 0 ;
+    restaurant spr {
+        name : a
+        shape : {
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( spr , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+            # line [ ( 0 , 0 ) , ( 0 , 0 ) ]
+        }
+        marker : point [ ( spr , spr ) ]
+    } ;
+
+    list < num > spr = [ ] ;
+    list < coord > spr = [ spr , spr ] ;
+
+    list < restaurant > spr = [ spr , spr ] ;
+
+    foreach spr in spr . routes {
+        print ( spr ) ;
+        highlight ( spr ) ;
+    } ;
+
+    foreach spr in radius [ ( 0 , 0 ) , 0 ] {
+        highlight ( spr ) ;
+    } ;
+} ;

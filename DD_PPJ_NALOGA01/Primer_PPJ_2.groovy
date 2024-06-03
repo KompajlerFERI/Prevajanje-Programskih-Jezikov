@@ -2,7 +2,7 @@ const num spremenljivka = 14;
 const num spremenljivka = 14.421;
 string spremenljivka2 = "restavracija";
 coord coordinate = (46.245267, 15.234526);
-list<tip> name = [];
+list<string> name = [];
 
 #coordinate = (16.245267, 45.234526);
 
