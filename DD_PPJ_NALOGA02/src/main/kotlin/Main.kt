@@ -1,6 +1,5 @@
 import java.io.InputStream
 import java.io.File
-import java.io.FileOutputStream
 
 const val ERROR_STATE = 0
 
@@ -293,7 +292,6 @@ object ForForeachFFFAutomaton: DFA {
                 for (i in 0 until 10) {
                     setTransition(35, i+48, 29)
                 }
-
 
         //bend______________________________________
             setTransition(1, 'b', 36)
@@ -595,7 +593,6 @@ object ForForeachFFFAutomaton: DFA {
                     setTransition(55, i+48, 29)
                 }
 
-
         //in___________________________________________
             setTransition(1, 'i', 56)
                 //i{A..Z}
@@ -672,7 +669,6 @@ object ForForeachFFFAutomaton: DFA {
 
             //"[A-Za-z0-9\s\S]*"
             setTransition(59, '"', 74)
-
 
         //point______________________________________
             setTransition(1, 'p', 60)
@@ -810,7 +806,6 @@ object ForForeachFFFAutomaton: DFA {
                     for (i in 0 until 10) {
                         setTransition(68, i+48, 29)
                     }
-
 
         //coord______________________________________
             setTransition(1, 'c', 69)
@@ -988,7 +983,6 @@ object ForForeachFFFAutomaton: DFA {
                         setTransition(80, i+48, 29)
                     }
 
-
         //name______________________________________
             setTransition(1, 'n', 81)
                 //n{A..Z}
@@ -1080,7 +1074,6 @@ object ForForeachFFFAutomaton: DFA {
                 for (i in 0 until 10) {
                     setTransition(120, i+48, 29)
                 }
-
 
         //shape______________________________________
             setTransition(1, 's', 121)
@@ -1234,7 +1227,6 @@ object ForForeachFFFAutomaton: DFA {
                     setTransition(93, i+48, 29)
                 }
 
-
         //list & line_____________________________________
             setTransition(1, 'l', 94)
                 //l{A..Z}
@@ -1326,8 +1318,6 @@ object ForForeachFFFAutomaton: DFA {
                     for (i in 0 until 10) {
                         setTransition(99, i+48, 29)
                     }
-
-
 
         //routes______________________________________
             setTransition(1, 'r', 100)
@@ -1586,8 +1576,6 @@ object ForForeachFFFAutomaton: DFA {
                     setTransition(116, i+48, 29)
                 }
 
-
-
         //______________________________________
         //{A..Z}+
         for (i in 0 until 26) {
@@ -1610,9 +1598,6 @@ object ForForeachFFFAutomaton: DFA {
         setTransition(1, '=', 117)
         // .
         setTransition(1, '.', 118)
-
-
-
 
         //______________________________________
         setSymbol(2, Symbol.REAL)
@@ -1724,7 +1709,7 @@ object ForForeachFFFAutomaton: DFA {
         setSymbol(90, Symbol.VARIABLE)
         setSymbol(91, Symbol.VARIABLE)
         setSymbol(92, Symbol.VARIABLE)
-        setSymbol(93, Symbol.STRING)
+        setSymbol(93, Symbol.TYPE_STRING)
 
         setSymbol(94, Symbol.VARIABLE)
         setSymbol(95, Symbol.VARIABLE)
@@ -1807,6 +1792,8 @@ class Scanner(private val automaton: DFA, private val stream: InputStream) {
     }
 }
 
+// za izpis tokenov
+/*
 fun name(symbol: Symbol) =
     when (symbol) {
         Symbol.CONST -> "const"
@@ -1853,8 +1840,6 @@ fun name(symbol: Symbol) =
         Symbol.RESTAURANT -> "restaurant"
         else -> throw Error("Invalid symbol")
     }
-
-
 fun printTokens(scanner: Scanner, output: FileOutputStream) {
     val writer = output.writer(Charsets.UTF_8)
 
@@ -1867,7 +1852,887 @@ fun printTokens(scanner: Scanner, output: FileOutputStream) {
     writer.appendLine()
     writer.flush()
 }
+*/
+
+// BNF:
+/*
+Main_Program ::= Main_Program’’ semicol Main_Program’
+Main_Program’ ::= Main_Program semicol Main_Program’
+Main_Program’ ::= ''
+Main_Program’’ ::= Declaration
+Main_Program’’ ::= Assignment
+Main_Program’’ ::= City
+Main_Program’’ ::= For
+Declaration ::= const Declaration’
+Declaration ::= Declaration’
+Declaration’ ::= Type variable equals Expression
+Declaration’ ::= List variable equals ListContent
+Assignment ::= hash variable equals Expression
+List ::= type_list lthen Type mthan
+ListContent ::= lsq_bracket Inner_List rsq_bracket
+Inner_List ::= Expression Inner_List’
+Inner_List’ ::= comma Expression Inner_List’
+Inner_List’ ::= ''
+Type ::= type_number
+Type ::= type_string
+Type ::= type_coordinate
+Expression ::= Additive
+Additive ::= Multiplicative Additive’
+Additive’ ::= plus Multiplicative Additive’
+Additive’ ::= minus Multiplicative Additive’
+Additive’ ::= ''
+Multiplicative ::= Exponential Multiplicative’
+Multiplicative’ ::= times Exponential Multiplicative’
+Multiplicative’ ::= divide Exponential Multiplicative’
+Multiplicative’ ::= integer-divide Exponential Multiplicative’
+Multiplicative’ ::= ''
+Exponential ::= Unary Exponential’
+Exponential’ ::= pow Unary Exponential’
+Exponential’ ::= ''
+Unary ::= plus Primary
+Unary ::= minus Primary
+Unary ::= Primary
+Primary ::= real
+Primary ::= variable
+Primary ::= lbracket Additive rbracket
+City ::= city variable block_start City’ block_end semicol
+City’ ::= City’’’ semicol City’’
+City’’ ::= City’ semicol City’’
+City’’ ::= ''
+City’’’ ::= City_Constructs
+City’’’ ::= Declaration
+City’’’ ::= Assignment
+City’’’ ::= Print
+Print ::= print lbracket Expression rbracket
+City_Constructs ::= Restaurant
+City_Constructs ::= Road
+Restaurant ::= restaurant variable block_start Name Shape Marker Routes block_end
+Name ::= name colon String
+String ::= variable
+String ::= string
+Shape ::= shape colon block_start Lines block_end
+Lines ::= hash Line hash Line hash Line Line’
+Line’ ::= hash Line Line’
+Line’ ::= ''
+Line ::= line lsq_bracket Coord comma Coord rsq_bracket
+Coord ::= variable
+Coord ::= lbracket Expression comma Expression rbracket
+Marker ::= Marker’
+Marker ::= ''
+Marker’ ::= marker colon Point
+Point ::= point lsq_bracket Coord rsq_bracket
+Routes ::= Routes’
+Routes ::= ''
+Routes’ ::= routes colon lsq_bracket Roads rsq_bracket
+Roads ::= Road Road’
+Road’ ::= comma Road Roads’
+Road’ ::= ''
+Road ::= road variable block_start Name Road_Shapes block_end
+Road_Shapes ::= shape colon block_start  Road_Shapes’ Road_Shapes block_end
+Road_Shapes’ ::= Road_Shape semicol Road_Shapes’
+Road_Shapes’ ::= ''
+Road_Shape ::= Line
+Road_Shape ::= Bend
+Bend ::= hash bend lsq_bracket Coord comma Coord comma Expression rsq_bracket
+For ::= foreach variable in Variable block_start Program block_end
+Variable ::= variable
+Variable ::= Radius
+Radius ::= lsq_bracket Coord comma Expression rsq_bracket
+Program ::= Program’’ semicol Program’
+Program’ ::= Program semicol Program’
+Program’ ::= ''
+Program’’ ::= Declaration
+Program’’ ::= Assignment
+Program’’ ::= Print
+Program’’ ::= Highlight
+Highlight ::= highlight lbracket variable rbracket
+
+const -> const
+variable -> {A,…,Z,a,…,z,_}{A,…,Z,a,…,z,0,…,9,_}*
+equals -> =
+type_number -> num
+type_string -> string
+type_coordinate -> coord
+type_list -> list
+lthan -> <
+mthan -> >
+city -> city
+block_start -> {
+block_end -> }
+name -> name
+colon -> :
+string -> “{A,…,Z,a,…,z,0,…,9}*” oz. ASCII
+shape -> shape
+line -> line
+lsq_bracket -> [
+comma -> ,
+rsq_bracket -> ]
+lbracket -> (
+rbracket -> )
+marker  -> marker
+point-> point
+routes-> routes
+road-> road
+bend-> bend
+foreach-> foreach
+highlight -> highlight
+semicol -> ;
+hash -> #
+real -> {0,…,9}+(.{0,…,9}+)?
+plus -> +
+minus -> -
+times -> *
+divide -> /
+integer-divide -> //
+pow -> ^
+print -> print
+in -> in
+restaurant -> restaurant
+*/
+
+class Parser(private val lex: Scanner) {
+    private var token = lex.getToken() // tega vzame že, ko se kliče
+
+    fun MAIN_PROGRAM(): Boolean {
+        val result = MAIN_PROGRAM_PRIME_PRIME()
+        if (result && token.symbol == Symbol.SEMICOL) {
+            token = lex.getToken()
+            return MAIN_PROGRAM_PRIME()
+        } else {
+            return false
+        }
+    }
+
+    fun MAIN_PROGRAM_PRIME(): Boolean {
+        val result = MAIN_PROGRAM()
+        if (result && token.symbol == Symbol.SEMICOL) {
+            token = lex.getToken()
+            return MAIN_PROGRAM_PRIME()
+        }
+        return true
+    }
+
+    fun MAIN_PROGRAM_PRIME_PRIME(): Boolean {
+        if (DECLARATION()) {
+            return true
+        } else if (ASSIGNMENT()) {
+            return true
+        } else if (CITY()) {
+            return true
+        } else if (FOR()) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    fun DECLARATION(): Boolean {
+        if (token.symbol == Symbol.CONST) {
+            token = lex.getToken()
+            return DECLARATION_PRIME()
+        } else {
+            return DECLARATION_PRIME()
+        }
+    }
+
+    fun DECLARATION_PRIME(): Boolean {
+        if (TYPE()) {
+            if (token.symbol == Symbol.VARIABLE) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.EQUALS) {
+                    token = lex.getToken()
+                    return EXPRESSION()
+                }
+            }
+        } else if (LIST()) {
+            if (token.symbol == Symbol.VARIABLE) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.EQUALS) {
+                    token = lex.getToken()
+                    return LIST_CONTENT()
+                }
+            }
+        }
+        return false
+    }
+
+    fun ASSIGNMENT(): Boolean {
+        if (token.symbol == Symbol.HASH) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.VARIABLE) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.EQUALS) {
+                    token = lex.getToken()
+                    return EXPRESSION()
+                }
+            }
+        }
+        return false
+    }
+
+    fun LIST(): Boolean {
+        if (token.symbol == Symbol.TYPE_LIST) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.LTHAN) {
+                token = lex.getToken()
+                if (TYPE()) {
+                    if (token.symbol == Symbol.MTHAN) {
+                        token = lex.getToken()
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun LIST_CONTENT(): Boolean {
+        if (token.symbol == Symbol.LSQ_BRACKET) {
+            token = lex.getToken()
+            if (INNER_LIST()) {
+                if (token.symbol == Symbol.RSQ_BRACKET) {
+                    token = lex.getToken()
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    fun INNER_LIST(): Boolean {
+        if (EXPRESSION()) {
+            return INNER_LIST_PRIME()
+        }
+        return false
+    }
+
+    fun INNER_LIST_PRIME(): Boolean {
+        if (token.symbol == Symbol.COMMA) {
+            token = lex.getToken()
+            if (EXPRESSION()) {
+                return INNER_LIST_PRIME()
+            }
+        }
+        return true
+    }
+
+    fun TYPE(): Boolean {
+        return when (token.symbol) {
+            Symbol.TYPE_NUMBER -> {
+                token = lex.getToken()
+                true
+            }
+            Symbol.TYPE_STRING -> {
+                token = lex.getToken()
+                true
+            }
+            Symbol.TYPE_COORDINATE -> {
+                token = lex.getToken()
+                true
+            }
+            else -> false
+        }
+    }
+
+    fun EXPRESSION(): Boolean {
+        return ADDITIVE()
+    }
+
+    fun ADDITIVE(): Boolean {
+        return MULTIPLICATIVE() && ADDITIVE_PRIME()
+    }
+
+    fun ADDITIVE_PRIME(): Boolean {
+        if (token.symbol == Symbol.PLUS || token.symbol == Symbol.MINUS) {
+            token = lex.getToken()
+            return MULTIPLICATIVE() && ADDITIVE_PRIME()
+        }
+        return true
+    }
+
+    fun MULTIPLICATIVE(): Boolean {
+        return EXPONENTIAL() && MULTIPLICATIVE_PRIME()
+    }
+
+    fun MULTIPLICATIVE_PRIME(): Boolean {
+        if (token.symbol == Symbol.TIMES || token.symbol == Symbol.DIVIDES || token.symbol == Symbol.INTEGERDIVIDES) {
+            token = lex.getToken()
+            return EXPONENTIAL() && MULTIPLICATIVE_PRIME()
+        }
+        return true
+    }
+
+    fun EXPONENTIAL(): Boolean {
+        return UNARY() && EXPONENTIAL_PRIME()
+    }
+
+    fun EXPONENTIAL_PRIME(): Boolean {
+        if (token.symbol == Symbol.POW) {
+            token = lex.getToken()
+            return UNARY() && EXPONENTIAL_PRIME()
+        }
+        return true
+    }
+
+    fun UNARY(): Boolean {
+        if (token.symbol == Symbol.PLUS || token.symbol == Symbol.MINUS) {
+            token = lex.getToken()
+            return PRIMARY()
+        } else {
+            return PRIMARY()
+        }
+    }
+
+    fun PRIMARY(): Boolean {
+        return when (token.symbol) {
+            Symbol.REAL -> {
+                token = lex.getToken()
+                true
+            }
+            Symbol.VARIABLE -> {
+                token = lex.getToken()
+                true
+            }
+            Symbol.LBRACKET -> {
+                token = lex.getToken()
+                val result = EXPRESSION()
+                if (token.symbol == Symbol.RBRACKET) {
+                    token = lex.getToken()
+                    result
+                } else {
+                    false
+                }
+            }
+            else -> false
+        }
+    }
+
+    fun CITY(): Boolean {
+        if (token.symbol == Symbol.CITY) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.VARIABLE) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.BLOCK_START) {
+                    token = lex.getToken()
+                    if (CITY_PRIME()) {
+                        if (token.symbol == Symbol.BLOCK_END) {
+                            token = lex.getToken()
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun CITY_PRIME(): Boolean {
+        if (CITY_PRIME_PRIME()) {
+            if (token.symbol == Symbol.SEMICOL) {
+                token = lex.getToken()
+                return CITY_PRIME()
+            }
+        }
+        return true
+    }
+
+    fun CITY_PRIME_PRIME(): Boolean {
+        if (CITY_CONSTRUCTS()) {
+            return true
+        } else if (DECLARATION()) {
+            return true
+        } else if (ASSIGNMENT()) {
+            return true
+        } else if (PRINT()) {
+            return true
+        } else if (HIGHLIGHT()) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    fun CITY_PRIME_PRIME_PRIME(): Boolean {
+        if (CITY_CONSTRUCTS()) {
+            return true
+        } else if (DECLARATION()) {
+            return true
+        } else if (ASSIGNMENT()) {
+            return true
+        } else if (PRINT()) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    fun PRINT(): Boolean {
+        if (token.symbol == Symbol.PRINT) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.LBRACKET) {
+                token = lex.getToken()
+                if (EXPRESSION()) {
+                    if (token.symbol == Symbol.RBRACKET) {
+                        token = lex.getToken()
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun CITY_CONSTRUCTS(): Boolean {
+        if (RESTAURANT()) {
+            return true
+        } else if (ROAD()) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    fun RESTAURANT(): Boolean {
+        if (token.symbol == Symbol.RESTAURANT) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.VARIABLE) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.BLOCK_START) {
+                    token = lex.getToken()
+                    if (NAME()) {
+                        if (SHAPE()) {
+                            if (MARKER()) {
+                                if (ROUTES()) {
+                                    if (token.symbol == Symbol.BLOCK_END) {
+                                        token = lex.getToken()
+                                        return true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun NAME(): Boolean {
+        if (token.symbol == Symbol.NAME) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.COLON) {
+                token = lex.getToken()
+                if (STRING()) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    fun STRING(): Boolean {
+        return when (token.symbol) {
+            Symbol.VARIABLE -> {
+                token = lex.getToken()
+                true
+            }
+            Symbol.STRING -> {
+                token = lex.getToken()
+                true
+            }
+            else -> false
+        }
+    }
+
+    fun SHAPE(): Boolean {
+        if (token.symbol == Symbol.SHAPE) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.COLON) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.BLOCK_START) {
+                    token = lex.getToken()
+                    if (LINES()) {
+                        if (token.symbol == Symbol.BLOCK_END) {
+                            token = lex.getToken()
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun LINES(): Boolean {
+        if (token.symbol == Symbol.HASH) {
+            token = lex.getToken()
+            if (LINE()) {
+                if (token.symbol == Symbol.HASH) {
+                    token = lex.getToken()
+                    if (LINE()) {
+                        if (token.symbol == Symbol.HASH) {
+                            token = lex.getToken()
+                            if (LINE()) {
+                                return LINE_PRIME()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun LINE_PRIME(): Boolean {
+        if (token.symbol == Symbol.HASH) {
+            token = lex.getToken()
+            if (LINE()) {
+                return LINE_PRIME()
+            }
+        }
+        return true
+    }
+
+    fun LINE(): Boolean {
+        if (token.symbol == Symbol.LINE) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.LSQ_BRACKET) {
+                token = lex.getToken()
+                if (COORD()) {
+                    if (token.symbol == Symbol.COMMA) {
+                        token = lex.getToken()
+                        if (COORD()) {
+                            if (token.symbol == Symbol.RSQ_BRACKET) {
+                                token = lex.getToken()
+                                return true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun COORD(): Boolean {
+        if (token.symbol == Symbol.VARIABLE) {
+            token = lex.getToken()
+            return true
+        } else if (token.symbol == Symbol.LBRACKET) {
+            token = lex.getToken()
+            if (EXPRESSION()) {
+                if (token.symbol == Symbol.COMMA) {
+                    token = lex.getToken()
+                    if (EXPRESSION()) {
+                        if (token.symbol == Symbol.RBRACKET) {
+                            token = lex.getToken()
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun MARKER(): Boolean {
+        if (MARKER_PRIME()) {
+            return true
+        }
+        return false
+    }
+
+    fun MARKER_PRIME(): Boolean {
+        if (token.symbol == Symbol.MARKER) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.COLON) {
+                token = lex.getToken()
+                if (POINT()) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    fun POINT(): Boolean {
+        if (token.symbol == Symbol.POINT) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.LSQ_BRACKET) {
+                token = lex.getToken()
+                if (COORD()) {
+                    if (token.symbol == Symbol.RSQ_BRACKET) {
+                        token = lex.getToken()
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun ROUTES(): Boolean {
+        if (ROUTES_PRIME()) {
+            return true
+        }
+        return false
+    }
+
+    fun ROUTES_PRIME(): Boolean {
+        if (token.symbol == Symbol.ROUTES) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.COLON) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.LSQ_BRACKET) {
+                    token = lex.getToken()
+                    if (ROADS()) {
+                        if (token.symbol == Symbol.RSQ_BRACKET) {
+                            token = lex.getToken()
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun ROADS(): Boolean {
+        if (ROAD()) {
+            return ROADS_PRIME()
+        }
+        return false
+    }
+
+    fun ROADS_PRIME(): Boolean {
+        if (token.symbol == Symbol.COMMA) {
+            token = lex.getToken()
+            if (ROAD()) {
+                return ROADS_PRIME()
+            }
+        }
+        return true
+    }
+
+    fun ROAD(): Boolean {
+        if (token.symbol == Symbol.ROAD) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.VARIABLE) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.BLOCK_START) {
+                    token = lex.getToken()
+                    if (NAME()) {
+                        if (ROAD_SHAPES()) {
+                            if (token.symbol == Symbol.BLOCK_END) {
+                                token = lex.getToken()
+                                return true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun ROAD_SHAPES(): Boolean {
+        if (token.symbol == Symbol.SHAPE) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.COLON) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.BLOCK_START) {
+                    token = lex.getToken()
+                    if (ROAD_SHAPES_PRIME()) {
+                        if (token.symbol == Symbol.BLOCK_END) {
+                            token = lex.getToken()
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun ROAD_SHAPES_PRIME(): Boolean {
+        if (ROAD_SHAPE()) {
+            if (token.symbol == Symbol.SEMICOL) {
+                token = lex.getToken()
+                return ROAD_SHAPES_PRIME()
+            }
+        }
+        return true
+    }
+
+    fun ROAD_SHAPE(): Boolean {
+        if (LINE()) {
+            return true
+        } else if (BEND()) {
+            return true
+        }
+        return false
+    }
+
+    fun BEND(): Boolean {
+        if (token.symbol == Symbol.HASH) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.BEND) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.LSQ_BRACKET) {
+                    token = lex.getToken()
+                    if (COORD()) {
+                        if (token.symbol == Symbol.COMMA) {
+                            token = lex.getToken()
+                            if (COORD()) {
+                                if (token.symbol == Symbol.COMMA) {
+                                    token = lex.getToken()
+                                    if (EXPRESSION()) {
+                                        if (token.symbol == Symbol.RSQ_BRACKET) {
+                                            token = lex.getToken()
+                                            return true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun FOR(): Boolean {
+        if (token.symbol == Symbol.FOREACH) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.VARIABLE) {
+                token = lex.getToken()
+                if (token.symbol == Symbol.IN) {
+                    token = lex.getToken()
+                    if (VARIABLE()) {
+                        if (token.symbol == Symbol.BLOCK_START) {
+                            token = lex.getToken()
+                            if (PROGRAM()) {
+                                if (token.symbol == Symbol.BLOCK_END) {
+                                    token = lex.getToken()
+                                    return true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun VARIABLE(): Boolean {
+        return when (token.symbol) {
+            Symbol.VARIABLE -> {
+                token = lex.getToken()
+                true
+            }
+            Symbol.RSQ_BRACKET -> {
+                token = lex.getToken()
+                true
+            }
+            else -> false
+        }
+    }
+
+    fun RADIUS(): Boolean {
+        if (token.symbol == Symbol.LSQ_BRACKET) {
+            token = lex.getToken()
+            if (COORD()) {
+                if (token.symbol == Symbol.COMMA) {
+                    token = lex.getToken()
+                    if (EXPRESSION()) {
+                        if (token.symbol == Symbol.RSQ_BRACKET) {
+                            token = lex.getToken()
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun PROGRAM(): Boolean {
+        val result = PROGRAM_PRIME_PRIME()
+        if (result && token.symbol == Symbol.SEMICOL) {
+            token = lex.getToken()
+            return PROGRAM_PRIME()
+        } else {
+            return false
+        }
+    }
+
+    fun PROGRAM_PRIME(): Boolean {
+        val result = PROGRAM()
+        if (result && token.symbol == Symbol.SEMICOL) {
+            token = lex.getToken()
+            return PROGRAM_PRIME()
+        }
+        return true
+    }
+
+    fun PROGRAM_PRIME_PRIME(): Boolean {
+        if (DECLARATION()) {
+            return true
+        } else if (ASSIGNMENT()) {
+            return true
+        } else if (PRINT()) {
+            return true
+        } else if (HIGHLIGHT()) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    fun HIGHLIGHT(): Boolean {
+        if (token.symbol == Symbol.HIGHLIGHT) {
+            token = lex.getToken()
+            if (token.symbol == Symbol.LBRACKET) {
+                token = lex.getToken()
+                if (VARIABLE()) {
+                    if (token.symbol == Symbol.RBRACKET) {
+                        token = lex.getToken()
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    fun PARSE(): Boolean {
+        val result = MAIN_PROGRAM()
+        return result && token.symbol == Symbol.EOF
+    }
+}
 
 fun main(args: Array<String>) {
-    printTokens(Scanner(ForForeachFFFAutomaton, File(args[0]).inputStream()), File(args[1]).outputStream())
+    // za izpis tokenov
+    //printTokens(Scanner(ForForeachFFFAutomaton, File(args[0]).inputStream()), File(args[1]).outputStream())
+
+    // za parsanje oz. sintakticni del
+    ///*
+    if (args.size != 2) {
+        println("Usage: <input_file_name> <output_file_name>")
+        return
+    }
+
+    val fileInputName = args[0]
+    val fileOutputName = args[1]
+    val file = File(fileInputName)
+    val fileOutput = File(fileOutputName)
+
+    val lex = Scanner(ForForeachFFFAutomaton, file.inputStream())
+    val parser = Parser(lex)
+
+    val result = parser.PARSE()
+    fileOutput.writeText(if (result) "accept" else "reject")
+    //*/
 }
