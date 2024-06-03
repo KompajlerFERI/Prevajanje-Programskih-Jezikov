@@ -160,7 +160,7 @@ object ForForeachFFFAutomaton: DFA {
         // +
         setTransition(1, '+', 17)
         // -
-        setTransition(8, '-', 18)
+        setTransition(1, '-', 18)
         // *
         setTransition(1, '*', 19)
         // /
