@@ -1,5 +1,7 @@
 import java.io.InputStream
 import java.io.File
+import kotlin.math.floor
+import kotlin.math.pow
 
 const val ERROR_STATE = 0
 
@@ -1940,6 +1942,7 @@ fun printTokens(scanner: Scanner, output: FileOutputStream) {
 
 // BNF:
 /*
+Main ::= Main_Program
 Main_Program ::= Main_Program’’ ; Main_Program’
 Main_Program’ ::= Main_Program
 Main_Program’ ::= ''
@@ -2047,24 +2050,135 @@ Program’’ ::= Highlight
 Highlight ::= highlight ( spr )
 */
 
+/*
 interface Block {
-    fun toGeoJSON()
+    fun toGeoJSON(level: Int): String
+    fun tabulators(level: Int): String {
+        var tabs = ""
+        for (i in 0 until level) {
+            tabs += "\t"
+        }
+        return tabs
+    }
+}
+
+class Main {
+    private val blocks = mutableListOf<Block>()
+    fun addBlock(block: Block) {
+        block.tabulators(2)
+        blocks.add(block)
+    }
+    fun toGeoJSON(): String {
+        return "{\n" +
+                    "\t\"type\": \"FeatureCollection\"," +
+                    "\t\"features\": [\n" +
+                        blocks.joinToString("") +
+                    "\n\t]\n" +
+                "\n}"
+    }
 }
 
 class MainProgram : Block {
     private val blocks = mutableListOf<Block>()
+    override fun toGeoJSON(level: Int): String {
+        return MainProgramPrimePrime.toGeoJSON(level) +
+                ";" +
+                MainProgramPrime.toGeoJSON(level)
+    }
+}
 
-    fun addBlock(block: Block) {
-        blocks.add(block)
+class MainProgramPrime : Block {
+    private val blocks = mutableListOf<Block>()
+    override fun toGeoJSON(level: Int): String {
+        return MainProgram.toGeoJSON(level)
+    }
+}
+ */
+
+interface Expr {
+    fun eval(): Double
+}
+
+class Plus(private val expr: Expr, private val nextExpr: Expr) : Expr {
+    override fun eval(): Double = expr.eval() + nextExpr.eval()
+
+    override fun toString(): String =
+        "($expr + $nextExpr)"
+}
+
+class Minus(private val expr: Expr, private val nextExpr: Expr) : Expr {
+    override fun eval(): Double = expr.eval() - nextExpr.eval()
+
+    override fun toString(): String =
+        "($expr - $nextExpr)"
+}
+
+class Times(private val expr: Expr, private val nextExpr: Expr) : Expr {
+    override fun eval(): Double = expr.eval() * nextExpr.eval()
+
+    override fun toString(): String =
+        "($expr * $nextExpr)"
+}
+
+class Divides(private val expr: Expr, private val nextExpr: Expr) : Expr {
+    override fun eval(): Double = expr.eval() / nextExpr.eval()
+
+    override fun toString(): String =
+        "($expr / $nextExpr)"
+}
+
+class IntegerDivides(private val expr: Expr, private val nextExpr: Expr) : Expr {
+    override fun eval(): Double = floor(expr.eval() / nextExpr.eval())
+
+    override fun toString(): String =
+        "($expr // $nextExpr)"
+}
+
+class UnaryPlus(private val expr: Expr) : Expr {
+    override fun eval(): Double = +expr.eval()
+
+    override fun toString(): String =
+        "(+$expr)"
+}
+
+class UnaryMinus(private val expr: Expr) : Expr {
+    override fun eval(): Double = -expr.eval()
+
+    override fun toString(): String =
+        "(-$expr)"
+}
+
+class Real(private val double: Double) : Expr {
+    override fun eval(): Double = double
+
+    override fun toString(): String =
+        "$double"
+}
+
+class Variable(private val string: String) : Expr {
+    override fun eval(): Double = when (string) {
+        "x" -> 1.0
+        "y" -> 3.0
+        else -> throw IllegalArgumentException("Unknown variable: $string")
     }
 
-    override fun toGeoJSON() {
-        blocks.forEach { it.toGeoJSON() }
-    }
+    override fun toString(): String =
+        "$string"
+}
+
+class Pow(private val expr: Expr, private val nextExpr: Expr) : Expr {
+    override fun eval(): Double = expr.eval().pow(nextExpr.eval())
+
+    override fun toString(): String =
+        "($expr ^ ($nextExpr))"
 }
 
 class Parser(private val lex: Scanner) {
     private var token = lex.getToken() // tega vzame že, ko se kliče
+
+    fun MAIN(): Boolean {
+        return MAIN_PROGRAM()
+    }
 
     fun MAIN_PROGRAM(): Boolean {
         if (MAIN_PROGRAM_PRIME_PRIME()) {
@@ -2253,76 +2367,88 @@ class Parser(private val lex: Scanner) {
         }
     }
 
-    fun EXPRESSION(): Boolean {
+    fun EXPRESSION(): Expr {
         return ADDITIVE()
     }
 
-    fun ADDITIVE(): Boolean {
-        return MULTIPLICATIVE() && ADDITIVE_PRIME()
-    }
-
-    fun ADDITIVE_PRIME(): Boolean {
-        if (token.symbol == Symbol.PLUS || token.symbol == Symbol.MINUS) {
+    fun ADDITIVE(): Expr {
+        var expr = MULTIPlicative()
+        while (token.symbol == Symbol.PLUS || token.symbol == Symbol.MINUS) {
+            val op = token.symbol
             token = lex.getToken()
-            return MULTIPLICATIVE() && ADDITIVE_PRIME()
+            val nextExpr = MULTIPlicative()
+            expr = when (op) {
+                Symbol.PLUS -> Plus(expr, nextExpr)
+                Symbol.MINUS -> Minus(expr, nextExpr)
+                else -> throw IllegalArgumentException("Invalid operator: $op")
+            }
         }
-        return true
+        return expr
     }
 
-    fun MULTIPLICATIVE(): Boolean {
-        return EXPONENTIAL() && MULTIPLICATIVE_PRIME()
-    }
-
-    fun MULTIPLICATIVE_PRIME(): Boolean {
-        if (token.symbol == Symbol.TIMES || token.symbol == Symbol.DIVIDES || token.symbol == Symbol.INTEGERDIVIDES) {
+    fun MULTIPlicative(): Expr {
+        var expr = EXPONENTIAL()
+        while (token.symbol == Symbol.TIMES || token.symbol == Symbol.DIVIDES || token.symbol == Symbol.INTIGERDEVIDES) {
+            val op = token.symbol
             token = lex.getToken()
-            return EXPONENTIAL() && MULTIPLICATIVE_PRIME()
+            val nextExpr = EXPONENTIAL()
+            expr = when (op) {
+                Symbol.TIMES -> Times(expr, nextExpr)
+                Symbol.DIVIDES -> Divides(expr, nextExpr)
+                Symbol.INTEGERDIVIDES -> IntegerDivides(expr, nextExpr)
+                else -> throw IllegalArgumentException("Invalid operator: $op")
+            }
         }
-        return true
+        return expr
     }
 
-    fun EXPONENTIAL(): Boolean {
-        return UNARY() && EXPONENTIAL_PRIME()
-    }
-
-    fun EXPONENTIAL_PRIME(): Boolean {
-        if (token.symbol == Symbol.POW) {
+    fun EXPONENTIAL(): Expr {
+        var expr = UNARY()
+        while (token.symbol == Symbol.POW) {
             token = lex.getToken()
-            return UNARY() && EXPONENTIAL_PRIME()
+            val nextExpr = EXPONENTIAL()
+            expr = Pow(expr, nextExpr)
         }
-        return true
+        return expr
     }
 
-    fun UNARY(): Boolean {
-        if (token.symbol == Symbol.PLUS || token.symbol == Symbol.MINUS) {
-            token = lex.getToken()
-            return PRIMARY()
-        } else {
-            return PRIMARY()
+    fun UNARY(): Expr {
+        return when (token.symbol) {
+            Symbol.PLUS -> {
+                token = lex.getToken()
+                UnaryPlus(PRIMARY())
+            }
+            Symbol.MINUS -> {
+                token = lex.getToken()
+                UnaryMinus(PRIMARY())
+            }
+            else -> PRIMARY()
         }
     }
 
-    fun PRIMARY(): Boolean {
+    fun PRIMARY(): Expr {
         return when (token.symbol) {
             Symbol.REAL -> {
+                val value = token.lexeme.toDouble()
                 token = lex.getToken()
-                true
+                Real(value)
             }
             Symbol.VARIABLE -> {
+                val variable = Variable(token.lexeme)
                 token = lex.getToken()
-                true
+                variable
             }
             Symbol.LBRACKET -> {
                 token = lex.getToken()
-                val result = EXPRESSION()
+                val expr = EXPRESSION()
                 if (token.symbol == Symbol.RBRACKET) {
                     token = lex.getToken()
-                    result
+                    expr
                 } else {
-                    false
+                    throw IllegalArgumentException("Missing closing parenthesis")
                 }
             }
-            else -> false
+            else -> throw IllegalArgumentException("Invalid token: $token")
         }
     }
 

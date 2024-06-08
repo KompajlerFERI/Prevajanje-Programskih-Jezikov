@@ -1,3 +1,4 @@
+Main ::= Main_Program
 Main_Program ::= Main_Program’’ ; Main_Program’
 Main_Program’ ::= Main_Program
 Main_Program’ ::= ''
