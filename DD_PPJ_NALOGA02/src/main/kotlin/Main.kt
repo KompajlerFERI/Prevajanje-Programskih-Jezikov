@@ -2047,6 +2047,22 @@ Program’’ ::= Highlight
 Highlight ::= highlight ( spr )
 */
 
+interface Block {
+    fun toGeoJSON()
+}
+
+class MainProgram : Block {
+    private val blocks = mutableListOf<Block>()
+
+    fun addBlock(block: Block) {
+        blocks.add(block)
+    }
+
+    override fun toGeoJSON() {
+        blocks.forEach { it.toGeoJSON() }
+    }
+}
+
 class Parser(private val lex: Scanner) {
     private var token = lex.getToken() // tega vzame že, ko se kliče
 
