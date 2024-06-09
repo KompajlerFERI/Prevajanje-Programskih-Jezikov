@@ -14,6 +14,9 @@ Declaration’ ::= List spr = ListContent
 DeclarationList’ ::= Type 
 DeclarationList’ ::= restaurant
 DeclarationList’ ::= city
+DeclarationList’ ::= num
+DeclarationList’ ::= string
+DeclarationList’ ::= coord
 Assignment ::= # spr = Assignment’
 Assignment’ ::= coord Coord
 Assignment’ ::= num Expression
@@ -25,9 +28,6 @@ Inner_List ::= Expression Inner_List’
 Inner_List ::= ''
 Inner_List’ ::= , Expression Inner_List’
 Inner_List’ ::= ''
-Type ::= num
-Type ::= string
-Type ::= coord
 Expression ::= Additive
 Additive ::= Multiplicative Additive’
 Additive’ ::= + Multiplicative Additive’
