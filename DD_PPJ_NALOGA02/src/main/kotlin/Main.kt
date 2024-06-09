@@ -1,8 +1,7 @@
 import java.io.InputStream
 import java.io.File
 import java.io.FileOutputStream
-import kotlin.math.floor
-import kotlin.math.pow
+import kotlin.math.*
 
 const val ERROR_STATE = 0
 
@@ -2100,11 +2099,11 @@ typealias Env = Map<String, Double>
 data class Result(val env: Env, val value: Real?, val trace: List<Double>)
 
 interface MAIN_PROGRAM_PRIME_PRIME {
-    fun toGeoJSON(): String
+    fun toGeoJSON(indent: Int = 0): String
 }
 
 interface ROAD_SHAPE_INTERFACE {
-    fun toGeoJSON(): String
+    fun toGeoJSON(indent: Int): String
 }
 
 class MainProgram(private val left: MAIN_PROGRAM_PRIME_PRIME, private val right: MAIN_PROGRAM_PRIME_PRIME): MAIN_PROGRAM_PRIME_PRIME {
@@ -2112,7 +2111,7 @@ class MainProgram(private val left: MAIN_PROGRAM_PRIME_PRIME, private val right:
         return "$left\n$right"
     }
 
-    override fun toGeoJSON(): String {
+    override fun toGeoJSON(indent: Int): String {
         return "${left.toGeoJSON()}\n${right.toGeoJSON()}"
     }
 }
@@ -2122,8 +2121,18 @@ class City(private val variable: Variable, private val cityInside: MAIN_PROGRAM_
         return "$cityInside"
     }
 
-    override fun toGeoJSON(): String {
-        return cityInside.toGeoJSON()
+    override fun toGeoJSON(indent: Int): String {
+        var string =
+            "\t".repeat(indent) + "{\n" +
+            "\t".repeat(indent + 1) + "\"type\": \"FeatureCollection\",\n" +
+            "\t".repeat(indent + 1) + "\"features\": [\n"
+
+        string += cityInside.toGeoJSON(indent + 2)
+
+        string += "\t".repeat(indent + 1) + "]\n" +
+            "\t".repeat(indent) + "}"
+
+        return string
     }
 }
 
@@ -2131,9 +2140,9 @@ class CityPrime(private val left: MAIN_PROGRAM_PRIME_PRIME, private val right: M
     override fun toString(): String {
         return "$left\n$right"
     }
-
-    override fun toGeoJSON(): String {
-        return "${left.toGeoJSON()}\n${right.toGeoJSON()}"
+    //tu pomoje morš dat is restaurant
+    override fun toGeoJSON(indent: Int): String {
+        return "${left.toGeoJSON(indent)},\n${right.toGeoJSON(indent)}"
     }
 }
 
@@ -2142,8 +2151,25 @@ class Restaurant(private val name: String, private val shape: MAIN_PROGRAM_PRIME
         return "Name:$name\nShape:$shape\nMarker:$marker\nRoutes:$routes"
     }
 
-    override fun toGeoJSON(): String {
-        TODO("Not yet implemented")
+    override fun toGeoJSON(indent: Int): String {
+        var string = "\t".repeat(indent) + "{\n" +
+                     "\t".repeat(indent + 1) + "\"type\": \"Feature\",\n" +
+                     "\t".repeat(indent + 1) + "\"properties\": {\n"
+
+        string +=    "\t".repeat(indent + 2) + "\"name\": $name\n"
+
+        string +=    "\t".repeat(indent + 1) + "},\n"
+
+        string +=    "${shape.toGeoJSON(indent + 1)}\n"
+
+        string +=    "\t".repeat(indent) + "},\n"
+
+        val routesGEOJson = routes.toGeoJSON(indent)
+
+        string +=    "${marker.toGeoJSON(indent)}${if (routesGEOJson.isBlank()) "" else ","}\n"
+
+        string +=    routesGEOJson
+        return string
     }
 }
 
@@ -2156,14 +2182,22 @@ class Coords(private val coords: MutableList<Coord>): MAIN_PROGRAM_PRIME_PRIME {
         return string
     }
 
-    override fun toGeoJSON(): String {
-        var string = ""
+    override fun toGeoJSON(indent: Int): String {
+        var string = "\t".repeat(indent) + "\"geometry\": {\n" +
+                     "\t".repeat(indent + 1) + "\"coordinates\": [\n" +
+                     "\t".repeat(indent + 2) + "[\n"
+
         for(coord in coords) {
-            string += coord.toGeoJSON()
+            string += "${coord.toGeoJSON(indent + 3)},\n"
         }
-        if(coords.size == 3) {
-            string += coords[2].toGeoJSON()
-        }
+
+        string += "${coords[0].toGeoJSON(indent + 3)}\n"
+
+        string +=    "\t".repeat(indent + 2) + "]\n" +
+                     "\t".repeat(indent + 1) + "],\n" +
+                     "\t".repeat(indent + 1) + "\"type\": \"Polygon\"\n" +
+                     "\t".repeat(indent) + "}"
+
         return string
     }
 }
@@ -2173,19 +2207,36 @@ class Line(private val left: Coord, private val right: Coord): MAIN_PROGRAM_PRIM
         return "Line: [ $left , $right]"
     }
 
-    override fun toGeoJSON(): String {
-        TODO("Not yet implemented")
+    override fun toGeoJSON(indent: Int): String {
+        var string = "\t".repeat(indent) + "\"geometry\": {\n" +
+                     "\t".repeat(indent + 1) + "\"coordinates\": [\n"
+
+        string +=    "${left.toGeoJSON(indent + 2)},\n" +
+                     "${right.toGeoJSON(indent + 2)}\n"
+
+        string +=    "\t".repeat(indent + 1) + "],\n" +
+                     "\t".repeat(indent + 1) + "\"type\": \"LineString\"\n" +
+                     "\t".repeat(indent) + "}\n"
+
+        return string
     }
 }
 
-class Coord(private val left: Expr, private val right: Expr): MAIN_PROGRAM_PRIME_PRIME {
+class Coord(val left: Expr, val right: Expr): MAIN_PROGRAM_PRIME_PRIME {
     override fun toString(): String {
         return "Coord ($left, $right)"
     }
 
     //tu boš mogo left.eval pa right.eval uporabit se mi zdi
-    override fun toGeoJSON(): String {
-        TODO("Not yet implemented")
+    override fun toGeoJSON(indent: Int): String {
+        var string = "\t".repeat(indent) + "[\n"
+
+            string += "\t".repeat(indent + 1) + "${left.eval(emptyMap())},\n" +
+                      "\t".repeat(indent + 1) + "${right.eval(emptyMap())}\n"
+
+        string +=    "\t".repeat(indent) + "]"
+
+        return string
     }
 }
 
@@ -2195,8 +2246,22 @@ class Point(private val coord: MAIN_PROGRAM_PRIME_PRIME): MAIN_PROGRAM_PRIME_PRI
     }
 
     //tu kličeš coord.toGeoJSON samo morš še dodat, da se pokaže kot marker
-    override fun toGeoJSON(): String {
-        TODO("Not yet implemented")
+    override fun toGeoJSON(indent: Int): String {
+        var string = "\t".repeat(indent) + "{\n" +
+                     "\t".repeat(indent + 1) + "\"type\": \"Feature\",\n" +
+                     "\t".repeat(indent + 1) + "\"properties\": {\n" +
+                     "\t".repeat(indent + 2) + "\"name\": \"Marker\"\n" +
+                     "\t".repeat(indent + 1) + "},\n" +
+                     "\t".repeat(indent + 1) + "\"geometry\": {\n" +
+                     "\t".repeat(indent + 2) + "\"type\": \"Point\",\n" +
+                     "\t".repeat(indent + 2) + "\"coordinates\":\n"
+
+        string += "${coord.toGeoJSON(indent + 3)}\n"
+
+        string += "\t".repeat(indent + 1) + "}\n" +
+                  "\t".repeat(indent) + "}"
+
+        return string
     }
 }
 
@@ -2209,12 +2274,20 @@ class Routes(private val roads: MutableList<Road>): MAIN_PROGRAM_PRIME_PRIME {
         return string
     }
 
-    override fun toGeoJSON(): String {
-        var string = ""
-        for(road in roads) {
-            string += road.toGeoJSON()
+    override fun toGeoJSON(indent: Int): String {
+        if(roads.size == 0) {
+            return ""
+        } else {
+            var string = ""
+            for(road in roads) {
+                string += road.toGeoJSON(indent)
+            }
+
+            string = string.dropLast(2)
+            string += "\n"
+
+            return string
         }
-        return string
     }
 }
 
@@ -2223,11 +2296,21 @@ class Road(private val name: String, private val roadShapes: MutableList<RoadSha
         return "Road { Name: $name Shape: $roadShapes }"
     }
 
-    override fun toGeoJSON(): String {
-        var string = ""
+    override fun toGeoJSON(indent: Int): String {
+        var string = "";
+
         for(roadShape in roadShapes) {
-            string += roadShape.toGeoJSON()
+            string += "\t".repeat(indent) + "{\n" +
+                      "\t".repeat(indent + 1) + "\"type\": \"Feature\",\n" +
+                      "\t".repeat(indent + 1) + "\"properties\": {\n" +
+                      "\t".repeat(indent + 2) + "\"name\": $name\n" +
+                      "\t".repeat(indent + 1) + "},\n"
+
+            string += roadShape.toGeoJSON(indent + 1)
+
+            string += "\t".repeat(indent) + "},\n"
         }
+
         return string
     }
 }
@@ -2237,12 +2320,12 @@ class RoadShape(private val roadShape: ROAD_SHAPE_INTERFACE): MAIN_PROGRAM_PRIME
         return "roadShape: $roadShape"
     }
 
-    override fun toGeoJSON(): String {
+    override fun toGeoJSON(indent: Int): String {
         var string = ""
         if(roadShape is Line) {
-            return roadShape.toGeoJSON()
+            return roadShape.toGeoJSON(indent)
         } else if (roadShape is Bend) {
-            return roadShape.toGeoJSON()
+            return roadShape.toGeoJSON(indent)
         } else {
             throw Exception("${roadShape::class.simpleName} is not a valid class for this operation")
         }
@@ -2254,8 +2337,103 @@ class Bend(private val left: Coord, private val right: Coord, private val bendAm
         return "Bend: [ $left , $right, $bendAmount]"
     }
 
-    override fun toGeoJSON(): String {
-        TODO("Not yet implemented")
+    override fun toGeoJSON(indent: Int): String {
+        var string = "\t".repeat(indent) + "\"geometry\": {\n" +
+                "\t".repeat(indent + 1) + "\"coordinates\": [\n"
+
+        if(bendAmount.eval(emptyMap()) == 0.0) {
+            string += "${left.toGeoJSON(indent + 2)},\n" +
+                      "${right.toGeoJSON(indent + 2)}\n"
+        } else {
+            //string += "${right.toGeoJSON(indent + 2)},\n"
+
+            val listOfCoords = generateCurvePoints(10);
+            for (coord in listOfCoords) {
+                string += "${coord.toGeoJSON(indent + 2)},\n"
+            }
+
+            string = string.dropLast(2)
+            string += "\n"
+
+            //string += "${left.toGeoJSON(indent + 2)}\n"
+        }
+
+        string +=    "\t".repeat(indent + 1) + "],\n" +
+                     "\t".repeat(indent + 1) + "\"type\": \"LineString\"\n" +
+                     "\t".repeat(indent) + "}\n"
+
+        return string
+    }
+
+    fun generateCurvePoints(numPoints: Int): List<Coord> {
+        val leftX = left.left.eval(emptyMap())
+        val leftY = left.right.eval(emptyMap())
+        val rightX = right.left.eval(emptyMap())
+        val rightY = right.right.eval(emptyMap())
+
+        val relativeAngle = Math.toRadians(bendAmount.eval(emptyMap()))
+        val oppositeRelativeAngle = PI - relativeAngle
+
+        val angle = angleBetween(leftX, leftY, rightX, rightY)
+        val dist = distanceBetween(leftX, leftY, rightX, rightY)
+        val constant = (4 / 3) * tan(PI / 8)
+
+        val c0 = offsetCoordinate(leftX, leftY, constant * dist, angle + relativeAngle)
+        val c1 = offsetCoordinate(rightX, rightY, constant * dist, angle + oppositeRelativeAngle)
+
+        val ps = mutableListOf<Coord>()
+        for (i in 0 .. numPoints) {
+            val t = i / numPoints.toDouble()
+            ps.add(at(t, leftX, leftY, c0.left.eval(emptyMap()), c0.right.eval(emptyMap()), c1.left.eval(emptyMap()), c1.right.eval(emptyMap()), rightX, rightY))
+        }
+        return ps
+    }
+
+    fun at(t: Double,
+           firstX: Double, firstY: Double,
+           secondX: Double, secondY: Double,
+           thirdX: Double, thirdY: Double,
+           fourthX: Double, fourthY: Double): Coord {
+
+        val oneMinusT = 1.0 - t
+        val oneMinusTSquared = oneMinusT * oneMinusT
+        val tSquared = t * t
+
+        val term1X = firstX * oneMinusT * oneMinusT * oneMinusT
+        val term1Y = firstY * oneMinusT * oneMinusT * oneMinusT
+
+        val term2X = secondX * 3.0 * oneMinusTSquared * t
+        val term2Y = secondY * 3.0 * oneMinusTSquared * t
+
+        val term3X = thirdX * 3.0 * oneMinusT * tSquared
+        val term3Y = thirdY * 3.0 * oneMinusT * tSquared
+
+        val term4X = fourthX * tSquared * t
+        val term4Y = fourthY * tSquared * t
+
+        val resultX = term1X + term2X + term3X + term4X
+        val resultY = term1Y + term2Y + term3Y + term4Y
+
+        return Coord(Real(resultX), Real(resultY))
+    }
+
+
+    fun angleBetween(leftX: Double, leftY: Double, rightX: Double, rightY: Double): Double {
+        val dx = rightX - leftX
+        val dy = rightY - leftY
+        return atan2(dy, dx)
+    }
+
+    fun distanceBetween(leftX: Double, leftY: Double, rightX: Double, rightY: Double): Double {
+        val dx = rightX - leftX
+        val dy = rightY - leftY
+        return sqrt(dx * dx + dy * dy)
+    }
+
+    fun offsetCoordinate(coordX: Double, coordY: Double, distance: Double, angle: Double): Coord {
+        val newX = coordX + distance * cos(angle)
+        val newY = coordY + distance * sin(angle)
+        return Coord(Real(newX), Real(newY))
     }
 }
 
@@ -3133,7 +3311,7 @@ fun main(args: Array<String>) {
 
     val result = Parser(Scanner(ForForeachFFFAutomaton, input.byteInputStream())).MAIN()
 
-    println(result)
+    println(result.toGeoJSON())
     /*za izpis tokenov
     printTokens(Scanner(ForForeachFFFAutomaton, File(args[0]).inputStream()), File(args[1]).outputStream())
 
