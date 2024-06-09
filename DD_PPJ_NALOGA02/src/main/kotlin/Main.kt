@@ -2147,19 +2147,22 @@ class Restaurant(private val name: String, private val shape: MAIN_PROGRAM_PRIME
     }
 }
 
-class Lines(private val lines: MutableList<Line>): MAIN_PROGRAM_PRIME_PRIME {
+class Coords(private val coords: MutableList<Coord>): MAIN_PROGRAM_PRIME_PRIME {
     override fun toString(): String {
         var string = ""
-        for(line in lines) {
-            string += "$line"
+        for(coord in coords) {
+            string += "$coord"
         }
         return string
     }
 
     override fun toGeoJSON(): String {
         var string = ""
-        for(line in lines) {
-            string += line.toGeoJSON()
+        for(coord in coords) {
+            string += coord.toGeoJSON()
+        }
+        if(coords.size == 3) {
+            string += coords[2].toGeoJSON()
         }
         return string
     }
@@ -2392,16 +2395,16 @@ class Parser(private val scanner: Scanner) {
 
     fun MAIN_PROGRAM_PRIME_PRIME(): MAIN_PROGRAM_PRIME_PRIME {
         return when (last?.symbol) {
-//            Symbol.CONST, Symbol.TYPE_COORDINATE, Symbol.TYPE_STRING, Symbol.TYPE_NUMBER, Symbol.TYPE_LIST -> {
-//                val declaration = DECLARATION()
-//                parseTerminal(Symbol.SEMICOL)
-//                declaration
-//            }
-//            Symbol.HASH -> {
-//                val assignment = ASSIGNMENT()
-//                parseTerminal(Symbol.SEMICOL)
-//                assignment
-//            }
+            /*Symbol.CONST, Symbol.TYPE_COORDINATE, Symbol.TYPE_STRING, Symbol.TYPE_NUMBER, Symbol.TYPE_LIST -> {
+                val declaration = DECLARATION()
+                parseTerminal(Symbol.SEMICOL)
+                declaration
+            }
+            Symbol.HASH -> {
+                val assignment = ASSIGNMENT()
+                parseTerminal(Symbol.SEMICOL)
+                assignment
+            } */
             Symbol.CITY -> {
                 val city = CITY()
                 parseTerminal(Symbol.SEMICOL)
@@ -2411,89 +2414,89 @@ class Parser(private val scanner: Scanner) {
         }
     }
 
-//    fun DECLARATION(): MAIN_PROGRAM_PRIME_PRIME {
-//        return when (last?.symbol) {
-//            Symbol.CONST -> {
-//                parseTerminal(Symbol.CONST)
-//                val declaration = DECLARATION_PRIME()
-//                declaration
-//            }
-//            Symbol.TYPE_COORDINATE, Symbol.TYPE_STRING, Symbol.TYPE_NUMBER, Symbol.TYPE_LIST -> DECLARATION_PRIME()
-//            else -> panic()
-//        }
-//    }
+    /*fun DECLARATION(): MAIN_PROGRAM_PRIME_PRIME {
+        return when (last?.symbol) {
+            Symbol.CONST -> {
+                parseTerminal(Symbol.CONST)
+                val declaration = DECLARATION_PRIME()
+                declaration
+            }
+            Symbol.TYPE_COORDINATE, Symbol.TYPE_STRING, Symbol.TYPE_NUMBER, Symbol.TYPE_LIST -> DECLARATION_PRIME()
+            else -> panic()
+        }
+    }
 
-//    fun DECLARATION_PRIME(): MAIN_PROGRAM_PRIME_PRIME {
-//        return when (last?.symbol) {
-//            Symbol.TYPE_COORDINATE -> {
-//                parseTerminal(Symbol.TYPE_COORDINATE)
-//                val variable = Variable(parseTerminal(Symbol.VARIABLE)) //tip coord
-//                parseTerminal(Symbol.EQUALS)
-//                val coord = COORD()
-//                Declaration(variable, coord)
-//            }
-//            Symbol.TYPE_STRING -> {
-//                parseTerminal(Symbol.TYPE_STRING)
-//                val variable = Variable(parseTerminal(Symbol.VARIABLE)) //tip string
-//                parseTerminal(Symbol.EQUALS)
-//                val string = STRING()
-//                Declaration(variable, string)
-//            }
-//            Symbol.TYPE_NUMBER -> {
-//                parseTerminal(Symbol.TYPE_NUMBER)
-//                val variable = Variable(parseTerminal(Symbol.VARIABLE)) //tip string
-//                parseTerminal(Symbol.EQUALS)
-//                val expr = parseAdditive()
-//                Declaration(variable, expr)
-//            }
-//            Symbol.TYPE_LIST -> {
-//                val listType = LIST() //tip list
-//                parseTerminal(Symbol.EQUALS)
-//                val listContent = LISTCONTENT()
-//                Declaration(listType, listContent) /*TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-//            }
-//            else -> panic()
-//        }
-//    }
+    fun DECLARATION_PRIME(): MAIN_PROGRAM_PRIME_PRIME {
+        return when (last?.symbol) {
+            Symbol.TYPE_COORDINATE -> {
+                parseTerminal(Symbol.TYPE_COORDINATE)
+                val variable = Variable(parseTerminal(Symbol.VARIABLE)) //tip coord
+                parseTerminal(Symbol.EQUALS)
+                val coord = COORD()
+                Declaration(variable, coord)
+            }
+            Symbol.TYPE_STRING -> {
+                parseTerminal(Symbol.TYPE_STRING)
+                val variable = Variable(parseTerminal(Symbol.VARIABLE)) //tip string
+                parseTerminal(Symbol.EQUALS)
+                val string = STRING()
+                Declaration(variable, string)
+            }
+            Symbol.TYPE_NUMBER -> {
+                parseTerminal(Symbol.TYPE_NUMBER)
+                val variable = Variable(parseTerminal(Symbol.VARIABLE)) //tip string
+                parseTerminal(Symbol.EQUALS)
+                val expr = parseAdditive()
+                Declaration(variable, expr)
+            }
+            Symbol.TYPE_LIST -> {
+                val listType = LIST() //tip list
+                parseTerminal(Symbol.EQUALS)
+                val listContent = LISTCONTENT()
+                Declaration(listType, listContent) /*TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+            }
+            else -> panic()
+        }
+    }
 
-//    fun ASSIGNMENT(): MAIN_PROGRAM_PRIME_PRIME {
-//        return when (last?.symbol) {
-//            Symbol.HASH -> {
-//                parseTerminal(Symbol.HASH)
-//                val variable = Variable(parseTerminal(Symbol.VARIABLE))
-//                parseTerminal(Symbol.EQUALS)
-//                val right = ASSIGNMENT_PRIME()
-//                Assignment(variable, right)
-//            }
-//            else -> panic()
-//        }
-//    }
+    fun ASSIGNMENT(): MAIN_PROGRAM_PRIME_PRIME {
+        return when (last?.symbol) {
+            Symbol.HASH -> {
+                parseTerminal(Symbol.HASH)
+                val variable = Variable(parseTerminal(Symbol.VARIABLE))
+                parseTerminal(Symbol.EQUALS)
+                val right = ASSIGNMENT_PRIME()
+                Assignment(variable, right)
+            }
+            else -> panic()
+        }
+    }
 
-//    fun ASSIGNMENT_PRIME(): MAIN_PROGRAM_PRIME_PRIME {
-//        return when (last?.symbol) {
-//            Symbol.TYPE_COORDINATE -> {
-//                parseTerminal(Symbol.TYPE_COORDINATE)
-//                val coord = COORD()
-//                coord
-//            }
-//            Symbol.TYPE_NUMBER -> {
-//                parseTerminal(Symbol.TYPE_NUMBER)
-//                val number = parseAdditive()
-//                number
-//            }
-//            Symbol.TYPE_STRING -> {
-//                parseTerminal(Symbol.TYPE_STRING)
-//                val string = STRING()
-//                string
-//            }
-//            Symbol.TYPE_LIST -> {
-//                /*TODO*/
-//            }
-//            else -> panic()
-//        }
-//    }
+    fun ASSIGNMENT_PRIME(): MAIN_PROGRAM_PRIME_PRIME {
+        return when (last?.symbol) {
+            Symbol.TYPE_COORDINATE -> {
+                parseTerminal(Symbol.TYPE_COORDINATE)
+                val coord = COORD()
+                coord
+            }
+            Symbol.TYPE_NUMBER -> {
+                parseTerminal(Symbol.TYPE_NUMBER)
+                val number = parseAdditive()
+                number
+            }
+            Symbol.TYPE_STRING -> {
+                parseTerminal(Symbol.TYPE_STRING)
+                val string = STRING()
+                string
+            }
+            Symbol.TYPE_LIST -> {
+                /*TODO*/
+            }
+            else -> panic()
+        }
+    }
 
-        /*fun LIST(): Boolean {
+        fun LIST(): Boolean {
             if (last?.symbol == Symbol.TYPE_LIST) {
                 last = scanner.getToken()
                 if (last?.symbol == Symbol.LTHAN) {
@@ -2630,41 +2633,35 @@ class Parser(private val scanner: Scanner) {
                     parseTerminal(Symbol.SHAPE)
                     parseTerminal(Symbol.COLON)
                     parseTerminal(Symbol.BLOCK_START)
-                    val lines = LINES()
+                    val coords = COORDS()
                     parseTerminal(Symbol.BLOCK_END)
-                    lines
+                    coords
                 }
                 else -> panic()
             }
         }
 
-        fun LINES(): MAIN_PROGRAM_PRIME_PRIME {
-            val lines = mutableListOf<Line>()
+        fun COORDS(): MAIN_PROGRAM_PRIME_PRIME {
+            val coords = mutableListOf<Coord>()
 
-            while(last?.symbol == Symbol.LINE) {
-                parseTerminal(Symbol.LINE)
-                parseTerminal(Symbol.LSQ_BRACKET)
-                val leftCoord = COORD()
-                parseTerminal(Symbol.COMMA)
-                val rightCoord = COORD()
-                parseTerminal(Symbol.RSQ_BRACKET)
+            while(last?.symbol == Symbol.LBRACKET) {
+                val currentCoord = COORD()
                 parseTerminal(Symbol.SEMICOL)
-
-                lines.add(Line(leftCoord, rightCoord))
+                coords.add(currentCoord)
             }
 
-            if (lines.size < 3) {
-                throw Exception("There should be atleast 3 lines")
+            if (coords.size < 3) {
+                throw Exception("There should be atleast 3 coords")
             }
-            return Lines(lines)
+            return Coords(coords)
         }
 
         fun COORD(): Coord {
             return when (last?.symbol) {
-//                Symbol.VARIABLE -> {
-//                    val variable = Variable(parseTerminal(Symbol.VARIABLE))
-//                    variable
-//                }
+                /*Symbol.VARIABLE -> {
+                    val variable = Variable(parseTerminal(Symbol.VARIABLE))
+                    variable
+                } */
                 Symbol.LBRACKET -> {
                     parseTerminal(Symbol.LBRACKET)
                     val leftExpr = parseAdditive()
@@ -2685,9 +2682,9 @@ class Parser(private val scanner: Scanner) {
                     val point = POINT()
                     point
                 }
-//                Symbol.ROUTES, Symbol.BLOCK_END -> {
-//
-//                }
+                /*Symbol.ROUTES, Symbol.BLOCK_END -> {
+
+                } */
                 else -> panic()
             }
         }
@@ -2792,240 +2789,238 @@ class Parser(private val scanner: Scanner) {
         }
     }
 
-//        fun ROADS(): Boolean {
-//            if (ROAD()) {
-//                return ROADS_PRIME()
-//            }
-//            return false
-//        }
-//
-//        fun ROADS_PRIME(): Boolean {
-//            val lines = mutableListOf<Line>()
-//
-//            while(last?.symbol == Symbol.LINE) {
-//                parseTerminal(Symbol.LINE)
-//                parseTerminal(Symbol.LSQ_BRACKET)
-//                val leftCoord = COORD()
-//                parseTerminal(Symbol.COMMA)
-//                val rightCoord = COORD()
-//                parseTerminal(Symbol.RSQ_BRACKET)
-//                parseTerminal(Symbol.SEMICOL)
-//
-//                lines.add(Line(leftCoord, rightCoord))
-//            }
-//
-//            if (lines.size < 3) {
-//                throw ParseException("There should be atleast 3 lines")
-//            }
-//            return Lines(lines)
-//        }
-//
-//        fun ROAD(): Boolean {
-//            if (last?.symbol == Symbol.ROAD) {
-//                last = scanner.getToken()
-//                if (last?.symbol == Symbol.VARIABLE) {
-//                    last = scanner.getToken()
-//                    if (last?.symbol == Symbol.BLOCK_START) {
-//                        last = scanner.getToken()
-//                        if (NAME()) {
-//                            if (ROAD_SHAPES()) {
-//                                if (last?.symbol == Symbol.BLOCK_END) {
-//                                    last = scanner.getToken()
-//                                    return true
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            return false
-//        }
-//
-//        fun ROAD_SHAPES(): Boolean {
-//            if (last?.symbol == Symbol.SHAPE) {
-//                last = scanner.getToken()
-//                if (last?.symbol == Symbol.COLON) {
-//                    last = scanner.getToken()
-//                    if (last?.symbol == Symbol.BLOCK_START) {
-//                        last = scanner.getToken()
-//                        if (ROAD_SHAPES_PRIME()) {
-//                            if (ROAD_SHAPES()) {
-//                                if (last?.symbol == Symbol.BLOCK_END) {
-//                                    last = scanner.getToken()
-//                                    return true
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            return true
-//        }
-//
-//        fun ROAD_SHAPES_PRIME(): Boolean {
-//            if (last?.symbol == Symbol.HASH) {
-//                last = scanner.getToken()
-//                if (ROAD_SHAPE()) {
-//                    return ROAD_SHAPES_PRIME()
-//                }
-//            }
-//            return true
-//        }
-//
-//
-//        fun BEND(): Boolean {
-//            if (last?.symbol == Symbol.BEND) {
-//                last = scanner.getToken()
-//                if (last?.symbol == Symbol.LSQ_BRACKET) {
-//                    last = scanner.getToken()
-//                    if (COORD()) {
-//                        if (last?.symbol == Symbol.COMMA) {
-//                            last = scanner.getToken()
-//                            if (COORD()) {
-//                                if (last?.symbol == Symbol.COMMA) {
-//                                    last = scanner.getToken()
-//                                    if (EXPRESSION()) {
-//                                        if (last?.symbol == Symbol.RSQ_BRACKET) {
-//                                            last = scanner.getToken()
-//                                            return true
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            return false
-//        }
-//
-//        fun FOR(): Boolean {
-//            if (last?.symbol == Symbol.FOREACH) {
-//                last = scanner.getToken()
-//                if (last?.symbol == Symbol.VARIABLE) {
-//                    last = scanner.getToken()
-//                    if (last?.symbol == Symbol.IN) {
-//                        last = scanner.getToken()
-//                        if (VARIABLE()) {
-//                            if (last?.symbol == Symbol.BLOCK_START) {
-//                                last = scanner.getToken()
-//                                if (PROGRAM()) {
-//                                    if (last?.symbol == Symbol.BLOCK_END) {
-//                                        last = scanner.getToken()
-//                                        return true
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            return false
-//        }
-//
-//        fun VARIABLE(): Boolean {
-//            if (last?.symbol == Symbol.VARIABLE) {
-//                last = scanner.getToken()
-//                return VARIABLE_PRIME()
-//            } else if (RADIUS()) {
-//                return true
-//            }
-//            return false
-//        }
-//
-//        fun VARIABLE_PRIME(): Boolean {
-//            if (last?.symbol == Symbol.DOT) {
-//                last = scanner.getToken()
-//                return VARIABLE_PRIME_PRIME()
-//            }
-//            return true
-//        }
-//
-//        fun VARIABLE_PRIME_PRIME(): Boolean {
-//            if (last?.symbol == Symbol.VARIABLE) {
-//                last = scanner.getToken()
-//                return true
-//            } else if (last?.symbol == Symbol.ROUTES) {
-//                last = scanner.getToken()
-//                return true
-//            }
-//            return false
-//        }
-//
-//        fun RADIUS(): Boolean {
-//            if (last?.symbol == Symbol.RADIUS) {
-//                last = scanner.getToken()
-//                if (last?.symbol == Symbol.LSQ_BRACKET) {
-//                    last = scanner.getToken()
-//                    if (COORD()) {
-//                        if (last?.symbol == Symbol.COMMA) {
-//                            last = scanner.getToken()
-//                            if (EXPRESSION()) {
-//                                if (last?.symbol == Symbol.RSQ_BRACKET) {
-//                                    last = scanner.getToken()
-//                                    return true
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            return false
-//        }
-//
-//        fun PROGRAM(): Boolean {
-//            val result = PROGRAM_PRIME_PRIME()
-//            if (result && last?.symbol == Symbol.SEMICOL) {
-//                last = scanner.getToken()
-//                return PROGRAM_PRIME()
-//            } else {
-//                return false
-//            }
-//        }
-//
-//        fun PROGRAM_PRIME(): Boolean {
-//            if (PROGRAM()) {
-//                return true
-//            }
-//            return true
-//        }
-//
-//        fun PROGRAM_PRIME_PRIME(): Boolean {
-//            if (DECLARATION()) {
-//                return true
-//            } else if (ASSIGNMENT()) {
-//                return true
-//            } else if (PRINT()) {
-//                return true
-//            } else if (HIGHLIGHT()) {
-//                return true
-//            } else {
-//                return false
-//            }
-//        }
-//
-//        fun HIGHLIGHT(): Boolean {
-//            if (last?.symbol == Symbol.HIGHLIGHT) {
-//                last = scanner.getToken()
-//                if (last?.symbol == Symbol.LBRACKET) {
-//                    last = scanner.getToken()
-//                    if (VARIABLE()) {
-//                        if (last?.symbol == Symbol.RBRACKET) {
-//                            last = scanner.getToken()
-//                            return true
-//                        }
-//                    }
-//                }
-//            }
-//            return false
-//        }
-//
-//        fun PARSE(): Boolean {
-//            val result = MAIN_PROGRAM()
-//            return result && last?.symbol == Symbol.EOF
-//        }
+    /*fun ROADS(): Boolean {
+            if (ROAD()) {
+                return ROADS_PRIME()
+            }
+            return false
+        }
 
-    ///-----------
+        fun ROADS_PRIME(): Boolean {
+            val lines = mutableListOf<Line>()
+
+            while(last?.symbol == Symbol.LINE) {
+                parseTerminal(Symbol.LINE)
+                parseTerminal(Symbol.LSQ_BRACKET)
+                val leftCoord = COORD()
+                parseTerminal(Symbol.COMMA)
+                val rightCoord = COORD()
+                parseTerminal(Symbol.RSQ_BRACKET)
+                parseTerminal(Symbol.SEMICOL)
+
+                lines.add(Line(leftCoord, rightCoord))
+            }
+
+            if (lines.size < 3) {
+                throw ParseException("There should be atleast 3 lines")
+            }
+            return Lines(lines)
+        }
+
+        fun ROAD(): Boolean {
+            if (last?.symbol == Symbol.ROAD) {
+                last = scanner.getToken()
+                if (last?.symbol == Symbol.VARIABLE) {
+                    last = scanner.getToken()
+                    if (last?.symbol == Symbol.BLOCK_START) {
+                        last = scanner.getToken()
+                        if (NAME()) {
+                            if (ROAD_SHAPES()) {
+                                if (last?.symbol == Symbol.BLOCK_END) {
+                                    last = scanner.getToken()
+                                    return true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false
+        }
+
+        fun ROAD_SHAPES(): Boolean {
+            if (last?.symbol == Symbol.SHAPE) {
+                last = scanner.getToken()
+                if (last?.symbol == Symbol.COLON) {
+                    last = scanner.getToken()
+                    if (last?.symbol == Symbol.BLOCK_START) {
+                        last = scanner.getToken()
+                        if (ROAD_SHAPES_PRIME()) {
+                            if (ROAD_SHAPES()) {
+                                if (last?.symbol == Symbol.BLOCK_END) {
+                                    last = scanner.getToken()
+                                    return true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true
+        }
+
+        fun ROAD_SHAPES_PRIME(): Boolean {
+            if (last?.symbol == Symbol.HASH) {
+                last = scanner.getToken()
+                if (ROAD_SHAPE()) {
+                    return ROAD_SHAPES_PRIME()
+                }
+            }
+            return true
+        }
+
+
+        fun BEND(): Boolean {
+            if (last?.symbol == Symbol.BEND) {
+                last = scanner.getToken()
+                if (last?.symbol == Symbol.LSQ_BRACKET) {
+                    last = scanner.getToken()
+                    if (COORD()) {
+                        if (last?.symbol == Symbol.COMMA) {
+                            last = scanner.getToken()
+                            if (COORD()) {
+                                if (last?.symbol == Symbol.COMMA) {
+                                    last = scanner.getToken()
+                                    if (EXPRESSION()) {
+                                        if (last?.symbol == Symbol.RSQ_BRACKET) {
+                                            last = scanner.getToken()
+                                            return true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false
+        }
+
+        fun FOR(): Boolean {
+            if (last?.symbol == Symbol.FOREACH) {
+                last = scanner.getToken()
+                if (last?.symbol == Symbol.VARIABLE) {
+                    last = scanner.getToken()
+                    if (last?.symbol == Symbol.IN) {
+                        last = scanner.getToken()
+                        if (VARIABLE()) {
+                            if (last?.symbol == Symbol.BLOCK_START) {
+                                last = scanner.getToken()
+                                if (PROGRAM()) {
+                                    if (last?.symbol == Symbol.BLOCK_END) {
+                                        last = scanner.getToken()
+                                        return true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false
+        }
+
+        fun VARIABLE(): Boolean {
+            if (last?.symbol == Symbol.VARIABLE) {
+                last = scanner.getToken()
+                return VARIABLE_PRIME()
+            } else if (RADIUS()) {
+                return true
+            }
+            return false
+        }
+
+        fun VARIABLE_PRIME(): Boolean {
+            if (last?.symbol == Symbol.DOT) {
+                last = scanner.getToken()
+                return VARIABLE_PRIME_PRIME()
+            }
+            return true
+        }
+
+        fun VARIABLE_PRIME_PRIME(): Boolean {
+            if (last?.symbol == Symbol.VARIABLE) {
+                last = scanner.getToken()
+                return true
+            } else if (last?.symbol == Symbol.ROUTES) {
+                last = scanner.getToken()
+                return true
+            }
+            return false
+        }
+
+        fun RADIUS(): Boolean {
+            if (last?.symbol == Symbol.RADIUS) {
+                last = scanner.getToken()
+                if (last?.symbol == Symbol.LSQ_BRACKET) {
+                    last = scanner.getToken()
+                    if (COORD()) {
+                        if (last?.symbol == Symbol.COMMA) {
+                            last = scanner.getToken()
+                            if (EXPRESSION()) {
+                                if (last?.symbol == Symbol.RSQ_BRACKET) {
+                                    last = scanner.getToken()
+                                    return true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false
+        }
+
+        fun PROGRAM(): Boolean {
+            val result = PROGRAM_PRIME_PRIME()
+            if (result && last?.symbol == Symbol.SEMICOL) {
+                last = scanner.getToken()
+                return PROGRAM_PRIME()
+            } else {
+                return false
+            }
+        }
+
+        fun PROGRAM_PRIME(): Boolean {
+            if (PROGRAM()) {
+                return true
+            }
+            return true
+        }
+
+        fun PROGRAM_PRIME_PRIME(): Boolean {
+            if (DECLARATION()) {
+                return true
+            } else if (ASSIGNMENT()) {
+                return true
+            } else if (PRINT()) {
+                return true
+            } else if (HIGHLIGHT()) {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        fun HIGHLIGHT(): Boolean {
+            if (last?.symbol == Symbol.HIGHLIGHT) {
+                last = scanner.getToken()
+                if (last?.symbol == Symbol.LBRACKET) {
+                    last = scanner.getToken()
+                    if (VARIABLE()) {
+                        if (last?.symbol == Symbol.RBRACKET) {
+                            last = scanner.getToken()
+                            return true
+                        }
+                    }
+                }
+            }
+            return false
+        }
+
+        fun PARSE(): Boolean {
+            val result = MAIN_PROGRAM()
+            return result && last?.symbol == Symbol.EOF
+        } */
 
     private fun parseAdditive(): Expr {
         return parseAdditive1(parseMultiplicative())
@@ -3139,25 +3134,24 @@ fun main(args: Array<String>) {
     val result = Parser(Scanner(ForForeachFFFAutomaton, input.byteInputStream())).MAIN()
 
     println(result)
-    // za izpis tokenov
-    //printTokens(Scanner(ForForeachFFFAutomaton, File(args[0]).inputStream()), File(args[1]).outputStream())
+    /*za izpis tokenov
+    printTokens(Scanner(ForForeachFFFAutomaton, File(args[0]).inputStream()), File(args[1]).outputStream())
 
-    // za parsanje oz. sintakticni del
-    ///*
-//    if (args.size != 2) {
-//        println("Usage: <input_file_name> <output_file_name>")
-//        return
-//    }
-//
-//    val fileInputName = args[0]
-//    val fileOutputName = args[1]
-//    val file = File(fileInputName)
-//    val fileOutput = File(fileOutputName)
-//
-//    val lex = Scanner(ForForeachFFFAutomaton, file.inputStream())
-//    val parser = Parser(lex)
-//
-//    val result = parser.PARSE()
-//    fileOutput.writeText(if (result) "accept" else "reject")
-    //*/
+     za parsanje oz. sintakticni del
+    if (args.size != 2) {
+        println("Usage: <input_file_name> <output_file_name>")
+        return
+    }
+
+    val fileInputName = args[0]
+    val fileOutputName = args[1]
+    val file = File(fileInputName)
+    val fileOutput = File(fileOutputName)
+
+    val lex = Scanner(ForForeachFFFAutomaton, file.inputStream())
+    val parser = Parser(lex)
+
+    val result = parser.PARSE()
+    fileOutput.writeText(if (result) "accept" else "reject")
+    */
 }
