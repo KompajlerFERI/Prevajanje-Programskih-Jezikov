@@ -1,0 +1,33 @@
+city jan {
+    restaurant abc {
+        name: "Jan"
+        shape: {
+            line[(1 + 2,2), (2,1 + 2)];
+            line[(1,2), (2,1)];
+            line[(1,2), (2,1)];
+        }
+        marker: point[(1.4,1.4)]
+        routes: [
+            road {
+                name: "Jan"
+                shape: {
+                    line[(0,0), (0,0)];
+                    bend[(0,0), (0,0), 0];
+                    line[(0,0), (0,0)];
+                    bend[(0,2^14), (0,0), 0];
+                    bend[(0,0), (0,0), 0];
+                }
+            };
+            road {
+                name: "Jan"
+                shape: {
+                    line[(0,0), (0,0)];
+                    bend[(0,0), (0,0), 0];
+                    line[(0,0), (0,0)];
+                    bend[(0,0), (0,0), 0];
+                    bend[(0,0), (0,0), 0];
+                }
+            };
+        ]
+    }
+};

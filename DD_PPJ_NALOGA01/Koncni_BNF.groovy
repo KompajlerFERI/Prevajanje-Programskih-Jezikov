@@ -1,19 +1,22 @@
 Main ::= Main_Program
-Main_Program ::= Main_Program’’ ; Main_Program’
+Main_Program ::= Main_Program’’ Main_Program’
 Main_Program’ ::= Main_Program
 Main_Program’ ::= ''
-Main_Program’’ ::= Declaration
-Main_Program’’ ::= Assignment
-Main_Program’’ ::= City
+Main_Program’’ ::= Declaration ;
+Main_Program’’ ::= Assignment ;
+Main_Program’’ ::= City ;
 Declaration ::= const Declaration’
 Declaration ::= Declaration’
 Declaration’ ::= coord spr = Coord
 Declaration’ ::= string spr = String
 Declaration’ ::= num spr = Expression
 Declaration’ ::= List spr = ListContent
-DeclarationList’ ::= Type 
+DeclarationList’ ::= Type
 DeclarationList’ ::= restaurant
 DeclarationList’ ::= city
+DeclarationList’ ::= num
+DeclarationList’ ::= string
+DeclarationList’ ::= coord
 Assignment ::= # spr = Assignment’
 Assignment’ ::= coord Coord
 Assignment’ ::= num Expression
@@ -25,9 +28,6 @@ Inner_List ::= Expression Inner_List’
 Inner_List ::= ''
 Inner_List’ ::= , Expression Inner_List’
 Inner_List’ ::= ''
-Type ::= num
-Type ::= string
-Type ::= coord
 Expression ::= Additive
 Additive ::= Multiplicative Additive’
 Additive’ ::= + Multiplicative Additive’
@@ -48,6 +48,9 @@ Primary ::= 0
 Primary ::= spr
 Primary ::= ( Additive )
 City ::= city spr { City’ }
+City' ::= 1 ali večkrat;
+RESTAVRACIJA
+
 City’ ::= City’’’ ; City’’
 City’’ ::= City’
 City’’ ::= ''
